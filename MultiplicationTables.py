@@ -1,4 +1,4 @@
-from math import floor as floor
+from math import floor
 
 
 def OutputTable(number: float, length: int):
