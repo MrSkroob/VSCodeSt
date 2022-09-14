@@ -23,11 +23,11 @@ def input_date():
     if daysleft == 0:
         print("Happy birthday!")
     else:
-        additionalmessage = "days left until your birthday!"
-        if daysleft == 1:
-            additionalmessage = "day left until your birthday!"
-        print(daysleft, additionalmessage)
-    
+        print(daysleft, f"day{'s'[:daysleft!=1]} left until your birthday!")
+        # ^ is exclusive or in python (!= also works!)
+        # if daysleft == 0 then daysleft^1 = 0, therefore
+        # 's'[:0] returns ""
+        # 's'[:1] returns s (if one or more)
+        
 
 input_date()
-
