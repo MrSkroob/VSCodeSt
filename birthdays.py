@@ -2,12 +2,12 @@ import datetime
 
 
 def days_until_next_birthday(birthdaymonth: int, birthdayday: int):
-    nowdatetime = datetime.datetime.now()
-    birthdaydate = datetime.datetime(nowdatetime.year, birthdaymonth, birthdayday)
-    difference = birthdaydate - nowdatetime
-    if difference.days < 0:
+    nowdatetime = datetime.datetime.now() # create datetime object for right now
+    birthdaydate = datetime.datetime(nowdatetime.year, birthdaymonth, birthdayday) # create datetime object for birthday
+    difference = nowdatetime - birthdaydate
+    if difference.days < 0: # check if birthday has passed
         birthdaydate = datetime.datetime(nowdatetime.year + 1, birthdaymonth, birthdayday)
-    difference = birthdaydate - nowdatetime
+        difference = nowdatetime - birthdaydate # calculate difference again
     return difference.days
 
 
@@ -19,7 +19,14 @@ def input_date():
         datetime.datetime(year, month, day) # forces error to raise if date invalid
     except ValueError:
         return
-    print(days_until_next_birthday(month, day), "days until your birthday!")
+    daysleft = days_until_next_birthday(month, day)
+    if daysleft == 0:
+        print("Happy birthday!")
+    else:
+        additionalmessage = "days left until your birthday!"
+        if daysleft == 1:
+            additionalmessage = "day left until your birthday!"
+        print(daysleft, additionalmessage)
     
 
 input_date()
