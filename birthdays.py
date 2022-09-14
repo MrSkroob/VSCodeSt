@@ -4,11 +4,11 @@ import datetime
 def days_until_next_birthday(birthdaymonth: int, birthdayday: int):
     nowdatetime = datetime.datetime.now() # create datetime object for right now
     birthdaydate = datetime.datetime(nowdatetime.year, birthdaymonth, birthdayday) # create datetime object for birthday
-    difference = nowdatetime - birthdaydate
+    difference = birthdaydate - nowdatetime
     if difference.days < 0: # check if birthday has passed
         birthdaydate = datetime.datetime(nowdatetime.year + 1, birthdaymonth, birthdayday)
-        difference = nowdatetime - birthdaydate # calculate difference again
-    return difference.days
+        difference = abs(birthdaydate - nowdatetime) # calculate difference again
+    return difference.days + 1
 
 
 def input_date():
