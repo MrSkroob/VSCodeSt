@@ -20,7 +20,7 @@ def input_date():
     except ValueError:
         return
     daysleft = days_until_next_birthday(month, day)
-    if daysleft == 0:
+    if daysleft == 365:
         print("Happy birthday!")
     else:
         print(daysleft, f"day{'s'[:daysleft!=1]} left until your birthday!")
