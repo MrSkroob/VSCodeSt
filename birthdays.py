@@ -25,9 +25,7 @@ def input_date():
     else:
         print(daysleft, f"day{'s'[:daysleft!=1]} left until your birthday!")
         # ^ is exclusive or in python (!= also works!)
-        # if daysleft == 0 then daysleft^1 = 0, therefore
-        # 's'[:0] returns ""
-        # 's'[:1] returns s (if one or more)
+        #'s'[:False] returns None while 's'[:True] returns s
         
 
 input_date()
