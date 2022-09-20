@@ -18,7 +18,7 @@ class Stack():
         self.pointer -= 1
     
     def peak(self):
-        return self.stack[self.pointer]
+        return self.stack[self.pointer - 1]
     
     def isempty(self):
         return self.pointer == self.bottom
