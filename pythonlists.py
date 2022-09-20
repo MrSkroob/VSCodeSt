@@ -52,11 +52,11 @@ class Student():
 schooldata = get_file_data("scores.json")
 
 
-jacob = Student("Jacob", "Lower 6th")
+"""jacob = Student("Jacob", "Lower 6th")
 jacob.extract(schooldata)
 print(jacob.scores)
 jacob.update(schooldata)
-update_file("scores.json", schooldata)
+update_file("scores.json", schooldata)"""
 
 
 # asks yes or no question
