@@ -91,5 +91,8 @@ new_queue.pop()
 print(new_queue.queue)
 
 new_queue.add(0)
+new_queue.add(0)
 
 print(new_queue.isfull())
+
+print(new_queue.queue)

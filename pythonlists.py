@@ -105,11 +105,11 @@ def enter_student_scores(group: str):
 def display_average(group: str):
     testname = input("Input the exam name\n")
     scores = []
-    if not schooldata[group]:
+    if group not in schooldata:
         print("No data to display")
         return
     for i in schooldata[group]:
-        studentname = iter(i) # gets first key in dictionary. Python 3.7+ supported!!!!
+        studentname = next(iter(i)) # gets first key in dictionary. Python 3.7+ supported!!!!
         student = i[studentname]
         if testname in student: # checks if the student has data related to the test
             scores.append(student[testname])
@@ -122,11 +122,11 @@ def display_average(group: str):
 
 
 def display_class(group: str):
-    if not schooldata[group]:
+    if group not in schooldata:
         print("No data to display")
         return
     for i in schooldata[group]:
-        print(list(i.keys())[0])
+        print(next(iter(i)))
 
 
 def main():
