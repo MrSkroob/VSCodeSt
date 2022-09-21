@@ -138,8 +138,8 @@ def main():
             group = input("Good day, please enter the class you teach.\n")
             if group in schooldata:
                 break
-            elif ask_question("Couldn't find your class. Do you want to continue (y/n)?\n"):
-                break
+            elif not ask_question("Couldn't find your class. Do you want to continue (y/n)?\n"):
+                group = ""
         display_menu(group)
         option = None
         while option not in valid_options:
@@ -154,5 +154,5 @@ def main():
             display_class(group)
         elif option == "5":
             return
-                        
+   
 main()
