@@ -74,7 +74,6 @@ class Queue():
         return self.front == -1 and self.rear == -1
     
     def isfull(self):
-        print((self.rear + 1) % self.size) 
         return (self.rear + 1) % self.size == self.front
 
 
