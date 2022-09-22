@@ -63,7 +63,7 @@ class Queue():
         if self.front == -1 and self.rear == -1:
             raise IndexError("Queue empty")
         else:
-            self.queue[self.front] = None
+            del self.queue[self.front]
             if self.front == self.rear:
                 self.front = -1
                 self.rear = -1
