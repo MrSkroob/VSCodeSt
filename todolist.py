@@ -44,7 +44,7 @@ def main():
     else:
         print("Good evening.")
 
-    valid_inputs = ["1", "2", "3", "4"]
+    valid_inputs = ["1", "2", "3", "4", "5"]
     while True:
         print("""MENU
         1. Add a task
