@@ -13,7 +13,7 @@ def find_primes(): # my attempt
     multiple = 2
     number_to_test = multiple
     for _ in range(int(1000000 ** 0.5)):
-        for _ in range(multiple ** 2, int(1000000 / multiple), multiple):
+        for _ in range(multiple, int(1000000 / multiple), multiple):
             number_to_test += multiple
             primes[number_to_test - 1] = False # set every multiple to false
         multiple += 1 # increment to the next multiple
