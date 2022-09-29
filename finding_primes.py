@@ -28,8 +28,3 @@ print("My solution: ", time.process_time() - start)
 start = time.process_time()
 find_primes_wikipedia()
 print("Their solution: ", time.process_time() - start)
-
-
-"""find_primes(primes)
-
-find_primes_wikipedia()"""
