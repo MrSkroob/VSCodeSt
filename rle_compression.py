@@ -10,7 +10,7 @@ def compress(text: str):
                 compressed_string += most_recent_char + " " + str(char_count) + " "
             char_count = 0
             most_recent_char = i
-    compressed_string += text[-1:] + str(char_count + 1)
+    compressed_string += text[-1:] + " " + str(char_count + 1)
     return compressed_string
 
 
