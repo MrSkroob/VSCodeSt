@@ -33,7 +33,7 @@ class Card:
 
     def get_suit(self) -> str:
         """ return a string 'C', 'S', 'H', 'D' """
-        return SUITS[int(self._card_number / 13)][0]
+        return SUITS[self._card_number // 13][0]
 
     def get_value(self) -> str:
         """ return a string 'A'..'10', 'J', 'Q', 'K' """
@@ -45,7 +45,7 @@ class Card:
     def get_short_name(self) -> str:
         """ return card name eg '10D' '8C' 'AH' """
         value = VALUES[self._card_number % 13 - 1]
-        suit = SUITS[int(self._card_number / 13)][0]
+        suit = SUITS[self._card_number // 13][0]
         if not value.isnumeric():
             value = value[0]
         return value + suit
@@ -53,7 +53,7 @@ class Card:
     def get_long_name(self) -> str:
         """ return card name eg 'Ten of Diamonds' """
         value = VALUES[self._card_number % 13 - 1]
-        suit = SUITS[int(self._card_number / 13)]
+        suit = SUITS[self._card_number // 13]
         return value + " of " + suit
 
 
