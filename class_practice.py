@@ -13,5 +13,5 @@ class Rectangle():
         return pow(pow(self.width, 2) + pow(self.height, 2), 0.5)
 
 
-a_boxy_boy = Rectangle(4, 3)
+a_boxy_boy = Rectangle(4**12387, 3*9812)
 print(a_boxy_boy.get_area())
