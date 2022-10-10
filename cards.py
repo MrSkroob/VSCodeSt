@@ -74,17 +74,19 @@ class Deck:
 
     def take_top_card(self) -> Card:
         """ removes the top card from the deck and returns it (as a card object) """
-        return self._card_list[len(self._card_list)]
+        return self._card_list.pop()
 
 
-for i in range(41):
+"""for i in range(41):
     card = Card(i)
     print(card.get_suit())
     print(card.get_value())
     print(card.get_short_name())
+    print(card.get_long_name())"""
+
+
+deck = Deck()
+deck.shuffle_deck()
+for _ in range(deck.length()):
+    card = deck.take_top_card()
     print(card.get_long_name())
-# deck = Deck()
-# deck.shuffle_deck()
-# for _ in range(deck.length()):
-#     card = deck.take_top_card()
-#     print(card.get_long_name())
