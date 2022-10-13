@@ -1,4 +1,5 @@
 from __future__ import annotations
+import random
 
 
 class Vector3:
@@ -33,6 +34,9 @@ class Vector3:
             a[2]*b[0] - a[0]*b[2],
             a[0]*b[1] - a[1]*b[0]]
         return Vector3(result[0], result[1], result[2])
+    
+    def __eq__(self, vector: Vector2):
+        return self.x == vector.x and self.y == vector.y and self.z == vector.z
 
     def __add__(self, vector: Vector3) -> Vector3:
         self.x += vector.x
@@ -66,9 +70,9 @@ class Vector2:
         if self.x + self.y == 0:
             return Vector2(0, 0)
         sum_of_axis = self.x + self.y
-        x = self.x / sum_of_axis
-        y = self.y / sum_of_axis
-        return Vector2(x, y)
+        self.x /= sum_of_axis
+        self.y /= sum_of_axis
+        return self
 
     def dot(self, vector: Vector2) -> float:
         """returns dot product between two vector2s"""
@@ -83,6 +87,9 @@ class Vector2:
             a[2]*b[0] - a[0]*b[2],
             a[0]*b[1] - a[1]*b[0]]
         return Vector3(result[0], result[1], result[2])
+    
+    def __eq__(self, vector: Vector2):
+        return self.x == vector.x and self.y == vector.y
 
     def __add__(self, vector: Vector2) -> Vector2:
         self.x += vector.x
@@ -98,18 +105,32 @@ class Vector2:
         return f"({self.x}, {self.y})"
 
 
-vector2a = Vector2(1, 1)
-vector2b = Vector2(1, 0)
+def test():
+    test_length = 10
+    for _ in range(test_length):
+        x = random.randint(-1000, 1000)
+        y = random.randint(-1000, 1000)
+        x1 = random.randint(-1000, 1000)
+        y1 = random.randint(-1000, 1000)
+        assert Vector2(x, y) + Vector2(x1, y1) == Vector2(x + x1, y + y1), f"Expected {Vector2(x + x1, y + y1)}, got {Vector2(x, y) + Vector2(x1, y1)}"
+    for _ in range(test_length):
+        x = random.randint(-1000, 1000)
+        y = random.randint(-1000, 1000)
+        x1 = random.randint(-1000, 1000)
+        y1 = random.randint(-1000, 1000)
+        assert Vector2(x, y) - Vector2(x1, y1) == Vector2(x - x1, y - y1), f"Expected {Vector2(x - x1, y - y1)}, got {Vector2(x, y) - Vector2(x1, y1)}"
+    for _ in range(test_length):
+        x = random.randint(-1000, 1000)
+        y = random.randint(-1000, 1000)
+        test = Vector2(x, y).unit
+        if x == 0 and y == 0:
+            assert (test.x + test.y) == 0, f"Expected unit to == 0, got {test.x + test.y}"
+        assert 0.99 < (test.x + test.y) < 1.01, f"Expected unit to be around 0.99-1.01, got {test.x + test.y}"
+    assert 0.99 < Vector2(10, 0).dot(Vector2(1000000, 0)) < 1.01, f"Expected an answer between 0.99 and 1.01, got {Vector2(1, 0).dot(Vector2(1, 0))}"
+    assert Vector2(1, 0) * Vector2(0, 1) == Vector3(0, 0, 1), f"Expected (0, 0, 1), got {Vector2(1, 0) * Vector2(0, 1)}"
+    assert Vector2(1, 0) == Vector2(1, 0), "Vectors should equal"
+    assert Vector2(0, 1) != Vector2(2, 0), "Vectors should not equal"
+    print("ALL TESTS PASSED")
 
-print((vector2a * vector2b).unit) # this will become a vector3 because vector2s can't give a cross product.
 
-vector3a = Vector3(1, 0, 3)
-vector3b = Vector3(4, 5, 1)
-print(vector3a.magnitude)
-print(vector3b.magnitude)
-
-print(vector3a.unit)
-print(vector3b.unit)
-print((vector3a * vector3b).unit)
-print(vector3a - vector3b)
-print(vector3a + vector3b)
+test()
