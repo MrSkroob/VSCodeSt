@@ -17,12 +17,25 @@ class Node():
         return str(self._data)
 
 
+class StackIterator():
+    """Iterator class for stacks"""
+    def __init__(self, stack: Stack) -> None:
+        self._stack = stack
+        self._current_node = stack._head_node
+    
+    def __next__(self):
+        """Returns the next node"""
+        self._current_node = self._current_node.get_next_node()
+        if self._current_node is None:
+            raise StopIteration
+        return self._current_node
+
+
 class Stack():
     def __init__(self) -> None:
         self._size = 0
         self._bottom = 0
         self._head_node = None
-        self._stack = []
 
     @property
     def size(self):
@@ -32,21 +45,17 @@ class Stack():
         if self._size == 0:
             node = Node(data, None)
         else:
-            node = Node(data, self._stack[0])
+            node = Node(data, self._head_node)
         self._head_node = node
-        self._stack.insert(0, node)
         self._size += 1
     
     def pop(self):
         if self._size == self._bottom:
             raise IndexError("Stack is empty")
-        node: Node = self._stack.pop(0)
+        node = self._head_node
         self._head_node = node.get_next_node()
         self._size -= 1
         return node.data
-
-    def get_stack(self):
-        return self._stack
 
     def peak(self):
         return self._head_node
@@ -54,24 +63,37 @@ class Stack():
     def isempty(self):
         return self._size == self._bottom
 
+    def __iter__(self):
+        return StackIterator(self)
+    
+    def __str__(self):
+        if self._size == 0:
+            return ""
+        node = self._head_node
+        string = "["
+        for i in range(self._size):
+            if i == self._size - 1:
+                string += node.data + "]"
+            else:
+                string += node.data + ", "
+            node = node.get_next_node()
+        return string
+
 
 new_stack = Stack()
 new_stack.push("hello")
 new_stack.push("world")
 new_stack.push("!")
-
-
-print(new_stack.get_stack())
-
-
-for i in new_stack.get_stack():
-    print(i.data, i.get_next_node())
+print(new_stack)
+print(new_stack.peak())
 
 
 print("--------------------")
 new_stack.pop()
 new_stack.push("goodbye")
+print(new_stack)
+print(new_stack.peak())
 
-
-for i in new_stack.get_stack():
-    print(i.data, i.get_next_node())
+print("--------------------")
+for i in new_stack:
+    print(i)
