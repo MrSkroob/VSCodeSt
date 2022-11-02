@@ -27,9 +27,9 @@ class Vector3:
         magnitude1 = vector.magnitude
         return ((self.x * vector.x) + (self.y * vector.y) + (self.z * vector.z)) / (magnitude0 * magnitude1)
     
-    def __mul__(self, vector: Vector2) -> Vector2:
-        a = (self.x, self.y, 0)
-        b = (vector.x, vector.y, 0) # z component is 0 because it's a 2d vector.
+    def __mul__(self, vector: Vector3) -> Vector3:
+        a = (self.x, self.y, self.z)
+        b = (vector.x, vector.y, vector.z) # z component is 0 because it's a 2d vector.
         result = [a[1]*b[2] - a[2]*b[1],
             a[2]*b[0] - a[0]*b[2],
             a[0]*b[1] - a[1]*b[0]]
