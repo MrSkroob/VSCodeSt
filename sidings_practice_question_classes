@@ -1,0 +1,83 @@
+class Wagon():
+    def __init__(self, owner: str, weight: float, wheels: int) -> None:
+        self._owner_name = owner
+        self._weight = weight
+        self._number_of_wheels = wheels
+    
+    def get_owner_name(self):
+        return self._owner_name
+
+    def get_weight(self):
+        return self._weight
+
+    def get_number_of_wheels(self):
+        return self._number_of_wheels
+
+
+class OpenWagon(Wagon):
+    def __init__(self, owner: str, weight: float, wheels: int) -> None:
+        super().__init__(owner, weight, wheels)
+
+
+class ClosedWagon(Wagon):
+    def __init__(self, owner: str, weight: float, wheels: int, can_store_food: bool, doors: int, height: float) -> None:
+        super().__init__(owner, weight, wheels)
+        self._suitable_for_food = can_store_food
+        self._number_of_doors = doors
+        self._height = height
+    
+    def is_suitable_for_food(self):
+        return self._suitable_for_food
+    
+    def get_number_of_doors(self):
+        return self._number_of_doors
+    
+    def get_height(self):
+        return self._height
+
+
+class Siding():
+    def __init__(self, max_wagons: int) -> None:
+        self._top_pointer = -1
+        self._max_size = max_wagons
+        self._wagons = [None] * max_wagons
+
+    def pop(self) -> Wagon:
+        if self._top_pointer == -1:
+            return None
+        wagon_to_return = self._wagons[self._top_pointer]
+        self._top_pointer -= 1
+        return wagon_to_return
+
+    def push(self, wagon: Wagon):
+        if self._top_pointer >= self._max_size - 1:
+            raise IndexError("Stack is full")
+        self._top_pointer += 1
+        self._wagons[self._top_pointer] = wagon
+    
+    def get_wagons(self):
+        return self._wagons
+
+
+class Yard():
+    def __init__(self, sidings: int) -> None:
+        self._sidings = [Siding(30)] * sidings # sidings array
+        pass
+
+    def get_sidings(self):
+        return self._sidings
+
+
+yard = Yard(4)
+sidings = yard.get_sidings()
+for i in range(30):
+    sidings[0].push(Wagon("Yaccob Industries", 1682.23, 8))
+
+for i in range(10):
+    sidings[0].pop()
+
+for i in range(5):
+    sidings[0].push(ClosedWagon("Yacocb Industries", 34127, 8, True, 2, 8))
+
+
+print(sidings[0].get_wagons())
