@@ -106,18 +106,23 @@ class Board():
             string += "\n" + "|___" * self._ROW_SIZE + "|\n"
         return string
 
-game_board = Board(10)
+game_board = Board(5)
 player = Marker("X")
 enemy = Marker("O")
 
 game_board.set_cell(1, 1, player)
-game_board.set_cell(1, 2, enemy)
 game_board.set_cell(1, 3, player)
-game_board.set_cell(2, 2, enemy)
-game_board.set_cell(4, 2, enemy)
 game_board.set_cell(3, 3, player)
 game_board.set_cell(4, 4, player)
 game_board.set_cell(5, 5, player)
+
+game_board.set_cell(1, 2, enemy)
+game_board.set_cell(2, 2, enemy)
+game_board.set_cell(4, 2, enemy)
+game_board.set_cell(2, 3, enemy)
+game_board.set_cell(1, 2, enemy)
+game_board.set_cell(2, 4, enemy)
+game_board.set_cell(2, 1, enemy)
 
 print(game_board)
 print(game_board.check_win())
