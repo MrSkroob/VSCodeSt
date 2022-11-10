@@ -44,40 +44,66 @@ class Siding():
 
     def pop(self) -> Wagon:
         if self._top_pointer == -1:
-            return None
+            return None  # type: ignore
         wagon_to_return = self._wagons[self._top_pointer]
         self._top_pointer -= 1
-        return wagon_to_return
+        return wagon_to_return  # type: ignore
 
     def push(self, wagon: Wagon):
         if self._top_pointer >= self._max_size - 1:
             raise IndexError("Stack is full")
         self._top_pointer += 1
-        self._wagons[self._top_pointer] = wagon
+        self._wagons[self._top_pointer] = wagon  # type: ignore
     
     def get_wagons(self):
-        return self._wagons
+        return [self._wagons[i] for i in range(0, self._top_pointer)]
+
+    def __str__(self):
+        wagon_list = self.get_wagons()
+        if not wagon_list:
+            return ""
+        string = "["
+        for i, v in enumerate(wagon_list):
+            class_name = type(v).__name__
+            if i == self._top_pointer - 1:
+                string += class_name + "]"
+            else:
+                string += class_name + ", "
+        return string
 
 
 class Yard():
     def __init__(self, sidings: int) -> None:
-        self._sidings = [Siding(30)] * sidings # sidings array
+        self._sidings = [Siding(30) for _ in range(sidings)] # sidings array
         pass
 
     def get_sidings(self):
         return self._sidings
 
+    def __str__(self):
+        sidings_list = self._sidings
+        sidings_size = len(sidings_list)
+        if not sidings_list:
+            return ""
+        string = "["
+        for i, v in enumerate(sidings_list):
+            class_name = type(v).__name__
+            if i == sidings_size - 1:
+                string += class_name + "]"
+            else:
+                string += class_name + ", "
+        return string
+
 
 yard = Yard(4)
 sidings = yard.get_sidings()
-for i in range(30):
-    sidings[0].push(Wagon("Yaccob Industries", 1682.23, 8))
 
 for i in range(10):
+    sidings[0].push(Wagon("Yaccob Industries", 1682.23, 8))
+for i in range(8):
     sidings[0].pop()
-
 for i in range(5):
     sidings[0].push(ClosedWagon("Yacocb Industries", 34127, 8, True, 2, 8))
 
-
-print(sidings[0].get_wagons())
+print(yard)
+print(sidings[0])
