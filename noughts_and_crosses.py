@@ -14,11 +14,22 @@ class Marker(): # piece that each player will place
 
 
 class Board():
-    def __init__(self, collumns: int, rows: int) -> None:
-        # i would've added an option for non square boards, but it breaks :(
+    offsets = ( # offsets by collumn, row
+            (-1, -1), # top_left
+            (0, -1), # top
+            (1, -1), # top_right
+            (-1, 0), # left
+            (1, 0), # right
+            (-1, 1), # bottom_left
+            (0, 1), # bottom
+            (1, 1), # bottom_right
+        )
+    
+    def __init__(self, collumns: int, rows: int, rows_to_win: int) -> None:
         self._COLLUMN_SIZE = collumns
         self._ROW_SIZE = rows
         self._SQUARES = collumns * rows
+        self._ROWS_TO_WIN = rows_to_win
         self._data = [Marker('_')] * self._SQUARES
     
     def get_collumns(self):
@@ -29,6 +40,12 @@ class Board():
     
     def get_squares(self):
         return self._SQUARES
+    
+    def get_rows_to_win(self):
+        return self._ROWS_TO_WIN
+    
+    def get_data(self):
+        return self._data
     
     def get_marker_at_position(self, collumn: int, row: int):
         """Returns a marker and its index within the board list"""
@@ -45,11 +62,13 @@ class Board():
         collumn = index % self._COLLUMN_SIZE
         row = index // self._COLLUMN_SIZE # // self._ROW_SIZE
         return collumn, row
-        
+
+    def set_cell_directly(self, index, marker):
+        """Directly adds a marker to the board - should only be used internally by bots"""
+        self._data[index] = marker
+
     def set_cell(self, collumn: int, row: int, marker: Marker) -> bool:
         """Adds a marker to a position on the board. Returns a boolean depending on success"""
-        collumn -= 1
-        row -= 1
         try:
             currently_occupied, index = self.get_marker_at_position(collumn, row)
         except IndexError:
@@ -62,40 +81,24 @@ class Board():
     
     def check_win(self):
         """Returns a marker object of who (or what) won."""
-        offsets = ( # offsets by collumn, row
-            (-1, -1), # top_left
-            (0, -1), # top
-            (1, -1), # top_right
-            (-1, 0), # left
-            (1, 0), # right
-            (-1, 1), # bottom_left
-            (0, 1), # bottom
-            (1, 1), # bottom_right
-        )
-        rows_to_win = 5
-        checked = [False] * self._SQUARES
         for i, marker in enumerate(self._data):
             marker_str = str(marker)
             if marker_str != "_": # only check if space isn't empty
-                if not checked[i]: # pieces that have checked around them
-                    for offset in offsets: # check around the current piece
-                        collumn, row = self.get_collumn_row_at_index(i) # convert current position into the collumn and row
-                        successes = 1
-                        try:
-                            while True:
-                                adj_marker, index = self.get_marker_at_position(collumn + offset[0], row + offset[1]) # get adjacvent marker
-                                if checked[index]:
-                                    break
-                                if adj_marker == marker:
-                                    collumn, row = self.get_collumn_row_at_index(index) # if matched, continuing offsetting the same way
-                                    successes += 1
-                                else:
-                                    break # try the next offset if adjacent marker doesn't match.
-                        except IndexError: # if the offset exits out of the board, catch the index error and try the next offset.
-                            pass
-                        if successes == rows_to_win:
-                            return marker
-                    checked[i] = True
+                for offset in self.offsets: # check around the current piece
+                    collumn, row = self.get_collumn_row_at_index(i) # convert current position into the collumn and row
+                    successes = 1
+                    try:
+                        while True:
+                            adj_marker, index = self.get_marker_at_position(collumn + offset[0], row + offset[1]) # get adjacvent marker
+                            if adj_marker == marker:
+                                collumn, row = self.get_collumn_row_at_index(index) # if matched, continuing offsetting the same way
+                                successes += 1
+                            else:
+                                break # try the next offset if adjacent marker doesn't match.
+                    except IndexError: # if the offset exits out of the board, catch the index error and try the next offset.
+                        pass
+                    if successes == self._ROWS_TO_WIN:
+                        return marker
         return None
     
     def __str__(self):
@@ -109,17 +112,176 @@ class Board():
                 string += "| " + str(marker) + " "
         return string
 
-game_board = Board(5, 5)
-player = Marker("X")
-enemy = Marker("O")
 
-for i in range(5 * 5):
-    collumn, row = game_board.get_collumn_row_at_index(i)
-    if random.randint(0, 1) == 1:
-        piece = Marker("O")
+class Player():
+    def __init__(self, marker: str, board: Board) -> None:
+        self._marker = Marker(marker)
+        self._board = board
+    
+    def get_marker(self):
+        return self._marker
+
+    def get_move(self):
+        """More or less 'gui' interface for inputing a move."""
+        board = self._board
+        max_collumns = board.get_collumns()
+        max_rows = board.get_rows()
+        collumn, row = 0, 0
+        while not (collumn in range(1, max_collumns) and row in range(1, max_rows)):
+            try:
+                collumn = int(input(f"Which collumn? (1 - {max_collumns})"))
+                row = int(input(f"Which row? (1 - {max_rows})"))
+            except ValueError:
+                pass
+            else:
+                break
+        return collumn - 1, row - 1
+    
+    def apply_move(self):
+        """More or less 'gui' interface for inputing a move."""
+        collumn, row = self.get_move()
+        _, index = self._board.get_marker_at_position(collumn, row)
+        self._board.set_cell_directly(index, self._marker)
+
+
+class Bot(Player):
+    def __init__(self, marker: str, board: Board) -> None:
+        super().__init__(marker, board)
+    
+    def get_threats(self, minimum_threat: int):
+        """Returns a list of threat locations. Each location includes the ((collumn0, row0), (offsetcollumn0, offsetrow0), successes), ((collumn1, row1), (offsetcollumn1, offsetrow1)"""
+        board = self._board
+        threats = []
+        checked = [False] * board._SQUARES
+        for i, marker in enumerate(board.get_data()):
+            marker_str = str(marker)
+            if marker_str != "_" and marker != self._marker: # only check if space isn't empty
+                if not checked[i]:
+                    for offset_i, offset in enumerate(board.offsets): # check around the current piece
+                        mark_as_checked = []
+                        collumn, row = board.get_collumn_row_at_index(i) # convert current position into the collumn and row
+                        start_collumn, start_row = collumn, row
+                        successes = 1
+                        spaces = 0
+                        try:
+                            while True:
+                                adj_marker, index = board.get_marker_at_position(collumn + offset[0], row + offset[1]) # get adjacvent marker
+                                if adj_marker == marker or (str(adj_marker) == "_" and spaces == 0):
+                                    collumn, row = board.get_collumn_row_at_index(index) # if matched, continuing offsetting the same way
+                                    mark_as_checked.append(index)
+                                    if str(adj_marker) == "_":
+                                        spaces += 1
+                                        adj_marker_, _ = board.get_marker_at_position(collumn + offset[0], row + offset[1])
+                                        if adj_marker_ == marker:
+                                            print("Space found", collumn, row)
+                                            threats.append((((start_collumn, start_row), board.offsets[len(board.offsets) - offset_i - 1], successes + 2), ((collumn, row), (0, 0))))
+                                    else:
+                                        successes += 1
+                                else:
+                                    break # try the next offset if adjacent marker doesn't match.
+                        except IndexError: # if the offset exits out of the board, catch the index error and try the next offset.
+                            pass
+                        if successes >= minimum_threat:
+                            for marked in mark_as_checked:
+                                checked[marked] = True 
+                            threats.append((((start_collumn, start_row), board.offsets[len(board.offsets) - offset_i - 1], successes), ((collumn, row), offset)))
+                            break
+        return threats
+
+
+    def get_random_move(self):
+        board = self._board
+        collumn, row = 0, 0
+        valid_moves = []
+        for i, v in enumerate(board.get_data()):
+            if str(v) == "_":
+                valid_moves.append(i)
+        if valid_moves:
+            move = random.choice(valid_moves)
+            collumn, row = board.get_collumn_row_at_index(move)
+        return collumn, row
+
+    def get_highest_threat(self, threats):
+        threat_to_tackle = []
+        max_threat = 0
+        for i in threats:
+            threat_level = i[0][2]
+            if threat_level > max_threat:
+                threat_to_tackle = i
+                max_threat = threat_level
+        return threat_to_tackle
+
+    def get_move(self):
+        board = self._board
+        collumn, row = -1, -1
+        threats = self.get_threats(board.get_rows_to_win() - 2)
+        threat_to_tackle = self.get_highest_threat(threats)
+        # for now, I haven't implemented the bot "attacking", so it will just go a random move when it doesn't need to defend.
+        if not threats:
+            collumn, row = self.get_random_move()
+        else: # threats found, go defensive. 
+            while True:
+                print(threat_to_tackle)
+                collumn0, row0 = threat_to_tackle[0][0][0], threat_to_tackle[0][0][1]
+                collumn1, row1 = threat_to_tackle[1][0][0], threat_to_tackle[1][0][1]
+                adj_marker_0, _ = board.get_marker_at_position(collumn0, row0)
+                adj_marker_1, _ = board.get_marker_at_position(collumn1, row1)
+
+                if adj_marker_1 != self._marker and adj_marker_0 != self._marker:
+                    move0 = (collumn0 - threat_to_tackle[1][1][0], row0 - threat_to_tackle[1][1][1])
+                    move1 = (collumn1 - threat_to_tackle[0][1][0], row1 - threat_to_tackle[0][1][1])
+                    move_chosen = 1
+                    if str(adj_marker_1) != "_" and adj_marker_1 != self._marker:
+                        collumn, row = move0[0], move0[1]
+                        move_chosen = 0
+                    else:
+                        collumn, row = move1[0], move1[1]
+                        move_chosen = 1
+                    try:
+                        occupied, _ = board.get_marker_at_position(collumn, row)
+                        if str(occupied) != "_": # if move chosen is occupied, go other side
+                            if move_chosen == 0:
+                                collumn, row = move1[0], move1[1]
+                            else:
+                                collumn, row = move0[0], move0[1]
+                            occupied, _ = board.get_marker_at_position(collumn, row) # if both moves occupied, attack instead. 
+                            if str(occupied) != "_":
+                                collumn, row = self.get_random_move()
+                            break
+                    except IndexError: # if other move exits the board, attack
+                        collumn, row = self.get_random_move()
+                        break
+                if collumn + row == -2:
+                    threats.remove(threat_to_tackle) # if chain completely blocked, remove the threat and search for a different one.
+                    threat_to_tackle = self.get_highest_threat(threats)
+                elif not threats:
+                    collumn, row = self.get_random_move() # if all threats blocked, go random move/attack
+                    break
+                else:
+                    break
+        print("Bot plays:", collumn, row)
+        return collumn, row
+        
+
+game_board = Board(5, 5, 4)
+player = Player("O", game_board)
+bot = Bot("X", game_board)
+
+
+while True:
+    print(game_board)
+    player.apply_move()
+    if game_board.check_win() == player.get_marker():
+        print(game_board)
+        print("You win!")
+        break
     else:
-        piece = Marker("X")
-    game_board.set_cell(collumn + 1, row + 1, piece)
+        pass
+    bot.apply_move()
+    if game_board.check_win() == bot.get_marker():
+        print(game_board)
+        print("Bot wins!")
+        break
+    else:
+        pass
 
-print(game_board)
-print(game_board.check_win())

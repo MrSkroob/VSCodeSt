@@ -37,17 +37,56 @@ def recursive_binary(array, item, lower_bound=None, upper_bound=None):
         return searched
 
 
+def merge(array_L, array_R, array):
+    i, j = 0, 0
+    l_size = len(array_L)
+    r_size = len(array_R)
+    arr_size = len(array)
+    while i + j < arr_size:
+        if j == r_size or (i < l_size and array_L[i] < array_R[i]):
+            array[i + j] = array_L[i]
+            i += 1
+        else:
+            array[i + j] = array_R[j]
+            j += 1
+    # if add_pointer == len(array) - 1:
+    #     return
+    # if left_pointer == len(array_L) - 1:
+    #     data = array_R[right_pointer]
+    #     right_pointer += 1
+    # elif right_pointer == len(array_R) - 1:
+    #     data = array_L[left_pointer]
+    #     left_pointer += 1
+    # else:
+    #     if array_L[left_pointer] < array_R[right_pointer]:
+    #         data = array_L[left_pointer]
+    #         left_pointer += 1
+    #     else:
+    #         data = array_R[right_pointer]
+    #         right_pointer += 1
+    # array[add_pointer] = data
+    # add_pointer += 1
+    # merge(array_L, array_R, array, left_pointer, right_pointer, add_pointer)
+
+
+def merge_sort(array):
+    size = len(array)
+    if size < 2:
+        return
+    middle = size // 2
+    array_L = array[0:middle]
+    array_R = array[middle:size]
+
+    merge_sort(array_L)
+    merge_sort(array_R)
+    merge(array_L, array_R, array)
+
+
 
 list_to_search = []
 for i in range(0, 100):
     list_to_search.append(random.randint(0, 100))
 
-list_to_search.sort()
 
-item_to_search = random.randint(0, 100)
-if item_to_search in list_to_search:
-    assert recursive_binary(list_to_search, item_to_search) == item_to_search, f"The function should've returned {item_to_search}"
-else:
-    assert recursive_binary(list_to_search, item_to_search) is None, "The function shouldn't have found anything!"
-print(recursive_binary(list_to_search, item_to_search))
-# print(binary_search(list_to_search, random.randint(0, 100)))
+merge_sort(list_to_search)
+print(list_to_search)
