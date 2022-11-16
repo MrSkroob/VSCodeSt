@@ -188,7 +188,7 @@ class Bot(Player):
                             if successes >= minimum_threat:
                                 for marked in mark_as_checked:
                                     checked[marked] = True 
-                                threats.append((((start_collumn, start_row), board.offsets[len(board.offsets) - offset_i - 1], successes), ((collumn, row), offset)))
+                                threats.append((((start_collumn, start_row), board.offsets[len(board.offsets) - offset_i - 1], successes), ((collumn - offset[0], row - offset[1]), offset)))
                                 break
         return threats
 
@@ -269,6 +269,8 @@ class Bot(Player):
                             else:
                                 collumn, row = move0[0], move0[1]
                             occupied, _ = board.get_marker_at_position(collumn, row) # if both moves occupied, attack instead.
+                            if str(occupied) != "_":
+                                collumn, row = self.get_random_move()
                         except IndexError:
                             collumn, row = -1, -1
                         # collumn, row = self.get_random_move()
@@ -286,7 +288,7 @@ class Bot(Player):
         return collumn, row
         
 
-game_board = Board(5, 5, 4)
+game_board = Board(7, 7, 5)
 player = Player("O", game_board)
 bot = Bot("X", game_board)
 
