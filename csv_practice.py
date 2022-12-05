@@ -38,6 +38,7 @@ def save_to_file(file: str, data: list):
 
 def read_from(file: str) -> list:
     with open(file, "r") as f:
+        f.readline() # advances the pointer by 1 line to skip the header
         data_list = []
         for line in f:
             line = line.strip("\n")
@@ -58,4 +59,3 @@ save_to_file("csv_practice.csv", engines_list)
 engines_list = read_from("csv_practice.csv")
 for e in engines_list:
     e.display_engine()
-    
