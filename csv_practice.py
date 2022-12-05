@@ -14,7 +14,7 @@ class Engine:
         print(f"Engine name: {self.name}, weight: {self.weight}, colour: {self.colour}")
     
     def _get_csv_data(self):
-        attributes = self.__dict__.items()
+        attributes = self.__dict__.items() # __dict__ gets all attributes of the class. 
         unzipped = list(zip(*attributes)) # * operator tells zip to unzip list
         headers = unzipped[0]
         attributes = unzipped[1]
@@ -29,21 +29,33 @@ class Engine:
         return ", ".join([str(i) for i in attributes]) + "\n"
 
 
+def save_to_file(file: str, data: list):
+    with open(file, "w") as f:
+        f.write(data[0].get_headers()) # write the header
+        for i in data:
+            f.write(i.get_csv_entry()) # Write the csv entries 
+
+
+def read_from(file: str) -> list:
+    with open(file, "r") as f:
+        data_list = []
+        for line in f:
+            line = line.strip("\n")
+            engine_data = line.split(", ")
+            data_list.append(Engine(engine_data[0], engine_data[1], engine_data[2]))
+        return data_list
+
+
 engines_list = []
 engines_list.append(Engine('Thomas', 600, 'blue'))
+engines_list.append(Engine('Percy', 600, 'Green'))
 engines_list.append(Engine('James', 650, 'red'))
 engines_list.append(Engine('Edward', 1000, 'blue'))
 engines_list.append(Engine('Gordon', 2500, 'blue'))
 engines_list.append(Engine('Henry', 2100, 'green'))
 
-print(engines_list)
+save_to_file("csv_practice.csv", engines_list)
+engines_list = read_from("csv_practice.csv")
 for e in engines_list:
     e.display_engine()
-
-if input("running this program will create a new csv file EACH TIME. reply with 'n' to cancel.").lower() == "n":
-    pass
-else:
-    with open("engines.csv", "x") as f:
-        f.write(engines_list[0].get_headers())
-        for i in engines_list:
-            f.write(i.get_csv_entry())
+    
