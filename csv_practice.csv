@@ -1,7 +1,7 @@
-name, weight, colour
-Thomas, 600, blue
-Percy, 600, Green
-James, 650, red
-Edward, 1000, blue
-Gordon, 2500, blue
-Henry, 2100, green
+"name","weight","colour"
+"Thomas","6000","blue"
+"Percy","600","Green"
+"James","650","red"
+"Edward","1000","blue"
+"Gordon","2500","blue"
+"Henry","2100","green"
