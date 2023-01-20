@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication, QLineEdit, QWidget, QMainWindow, QGridLayout, QLabel
+from PyQt6.QtWidgets import QApplication, QLineEdit, QWidget, QMainWindow, QGridLayout, QLabel, QPushButton, QColorDialog
 from PyQt6.QtCore import pyqtSignal
 
 
@@ -25,37 +25,47 @@ class MainWindow(QMainWindow):
         feet_label = QLabel("Feet")
         metre_label = QLabel("Metres")
 
-        feet_lineedit = ClickableLineEdit()
-        metre_lineedit = ClickableLineEdit()
+        self.feet_lineedit = ClickableLineEdit()
+        self.metre_lineedit = ClickableLineEdit()
+
+        self.set_theme_button = QPushButton("Select theme")
+        self.set_theme_button.clicked.connect(self.open_colour_dialogue)
 
         layout.addWidget(feet_label, 0, 0)
         layout.addWidget(metre_label, 1, 0)
-        layout.addWidget(feet_lineedit, 0, 1)
-        layout.addWidget(metre_lineedit, 1, 1)
+        layout.addWidget(self.feet_lineedit, 0, 1)
+        layout.addWidget(self.metre_lineedit, 1, 1)
+        layout.addWidget(self.set_theme_button, 2, 0)
 
-        def feet_changed(new_text: str):
-            try:
-                result = float(new_text) / 3.281
-                metre_lineedit.setText(str(result))
-            except ValueError:
-                metre_lineedit.setText("Error")
-            
-        def metres_changed(new_text: str):
-            try:
-                result = float(new_text) * 3.281
-                feet_lineedit.setText(str(result))
-            except ValueError:
-                feet_lineedit.setText("Error")
-
-        feet_lineedit.textEdited.connect(feet_changed)
-        feet_lineedit.clicked.connect(feet_lineedit.clear)
+        self.feet_lineedit.textEdited.connect(self._update_metre)
+        self.feet_lineedit.clicked.connect(self.feet_lineedit.clear)
         
-        metre_lineedit.textEdited.connect(metres_changed)
-        metre_lineedit.clicked.connect(metre_lineedit.clear)
-
+        self.metre_lineedit.textEdited.connect(self._update_feet)
+        self.metre_lineedit.clicked.connect(self.metre_lineedit.clear)
 
         self.setCentralWidget(widget)
 
+    
+    def open_colour_dialogue(self):
+        colour = QColorDialog().getColor()
+
+        if colour.isValid():
+            pass
+
+    
+    def _update_feet(self, new_value: str):
+        try:
+            result = float(new_value) * 3.281
+            self.feet_lineedit.setText(str(result))
+        except ValueError:
+            self.feet_lineedit.setText("Error")
+
+    def _update_metre(self, new_value: str):
+        try:
+            result = float(new_value) / 3.281
+            self.metre_lineedit.setText(str(result))
+        except ValueError:
+            self.metre_lineedit.setText("Error")
 
 
 app = QApplication(sys.argv)
