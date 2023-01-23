@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.feet_lineedit = ClickableLineEdit()
         self.metre_lineedit = ClickableLineEdit()
 
-        # self.set_theme_button = QPushButton("Select theme")
+        # self.set_theme_button = QPushButton("Select theme")-
         # self.set_theme_button.clicked.connect(self.open_colour_dialogue)
 
         layout.addWidget(feet_label, 0, 0)
