@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(metre_label, 1, 0)
         layout.addWidget(self.feet_lineedit, 0, 1)
         layout.addWidget(self.metre_lineedit, 1, 1)
-        layout.addWidget(self.set_theme_button, 2, 0)
+        # layout.addWidget(self.set_theme_button, 2, 0)
 
         self.feet_lineedit.textEdited.connect(self._update_metre)
         self.feet_lineedit.clicked.connect(self.feet_lineedit.clear)
