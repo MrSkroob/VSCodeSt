@@ -41,7 +41,9 @@ RULES = { # first parameter is function which replaces trailing characters with 
     PREFIX + "pi": [None, "π"],
     PREFIX + "sigma": [None, "Σ"],
     PREFIX + "omega": [None, "Ω"],
-    PREFIX + "deg": [None, "°"]
+    PREFIX + "deg": [None, "°"],
+    PREFIX + "union": [None, "∪"],
+    PREFIX + "intersect": [None, "∩"]
 }
 
 
