@@ -43,7 +43,8 @@ RULES = { # first parameter is function which replaces trailing characters with 
     PREFIX + "omega": [None, "Ω"],
     PREFIX + "deg": [None, "°"],
     PREFIX + "union": [None, "∪"],
-    PREFIX + "intersect": [None, "∩"]
+    PREFIX + "intersect": [None, "∩"],
+    "~~": [None, "≈"]
 }
 
 

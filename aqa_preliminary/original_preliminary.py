@@ -4,7 +4,7 @@
 # developed using Python 3.5.1
 
 import random
-import json
+
 
 class QueueOfTiles():
   def __init__(self, max_size: int) -> None:
@@ -65,46 +65,24 @@ class QueueOfTiles():
     return (self._rear + 1) % self._max_size == self._front
 
 
-class TextValues():
-  def __init__(self) -> None:
-    self.letter_frequency = [None] * 26
-    self.letter_scores = {}
-
-    # counting the number of each letter in the text file.
-    with open("C://Users//Yacco//VSCodeSt//aqa_preliminary//aqawords.txt", "r") as f:
-      text = f.read()
-      for i, v in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
-        self.letter_frequency[i] = text.count(v)
-
-    self.letter_count = sum(self.letter_frequency)
-
-    for i, v in enumerate(self.letter_frequency):
-      score = max([int((self.letter_count / v) / 5), 1])
-      print(chr(65 + i), score)
-      self.letter_scores[chr(65 + i)] = score
-
-  def get_character_from_index(index: int):
-    """Returns the alphabetic character from its ordinal position in the alphabet"""
-    return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index]
-
-
-class Leaderboard():
-  def __init__(self) -> None:
-    self._scores = {}
-    with open("high_scores.json", "r") as f:
-      self._scores = json.load(f)
-
-  def add_score(self, score: int, player_name: str):
-    for i in self._scores:
-      pass
-    pass
-
+def CreateTileDictionary():
+  TileDictionary = dict()
+  for Count in range(26):
+    if Count in [0, 4, 8, 13, 14, 17, 18, 19]:
+      TileDictionary[chr(65 + Count)] = 1
+    elif Count in [1, 2, 3, 6, 11, 12, 15, 20]:
+      TileDictionary[chr(65 + Count)] = 2
+    elif Count in [5, 7, 10, 21, 22, 24]:
+      TileDictionary[chr(65 + Count)] = 3
+    else:
+      TileDictionary[chr(65 + Count)] = 5
+  return TileDictionary
     
-def DisplayTileValues(TileData: TextValues, AllowedWords):
+def DisplayTileValues(TileDictionary, AllowedWords):
   print()
   print("TILE VALUES")
   print()  
-  for Letter, Points in TileData.letter_scores.items():
+  for Letter, Points in TileDictionary.items():
     print("Points for " + Letter + ": " + str(Points))
   print()
 
@@ -112,15 +90,18 @@ def GetStartingHand(TileQueue, StartHandSize):
   Hand = ""
   for Count in range(StartHandSize):
     Hand += TileQueue.pop()
-    TileQueue.append()
+    TileQueue.add_random_letter()
   return Hand
 
 def LoadAllowedWords():
   AllowedWords = []
-  WordsFile = open(r"C://Users//Yacco//VSCodeSt//aqa_preliminary//aqawords.txt", "r") # removed try and except so FileNotFoundError
-  for Word in WordsFile:
-    AllowedWords.append(Word.strip().upper())
-  WordsFile.close()
+  try:
+    WordsFile = open("aqawords.txt", "r")
+    for Word in WordsFile:
+      AllowedWords.append(Word.strip().upper())
+    WordsFile.close()
+  except:
+    pass
   return AllowedWords
 
 def CheckWordIsInTiles(Word, PlayerTiles):
@@ -133,22 +114,14 @@ def CheckWordIsInTiles(Word, PlayerTiles):
       InTiles = False
   return InTiles 
 
-def CheckWordIsValid(word: str, allowed_words: list) -> bool:
-    """Recursively binary searches through a SORTED list"""
-    upper_bound = len(allowed_words)
-    middle = (upper_bound // 2)
-    middle_word = allowed_words[middle]
-    if middle_word == word:
-        return True
-    elif upper_bound <= 1:
-        return False
-    if word > middle_word:
-        allowed_words = allowed_words[middle:upper_bound]
-        return CheckWordIsValid(word, allowed_words)
-    else:
-        upper_bound = middle
-        allowed_words = allowed_words[0:middle]
-        return CheckWordIsValid(word, allowed_words)
+def CheckWordIsValid(Word, AllowedWords):
+  ValidWord = False
+  Count = 0
+  while Count < len(AllowedWords) and not ValidWord:
+    if AllowedWords[Count] == Word:
+      ValidWord = True
+    Count += 1
+  return ValidWord
 
 def AddEndOfTurnTiles(TileQueue, PlayerTiles, NewTileChoice, Choice):
   if NewTileChoice == "1":
@@ -159,35 +132,35 @@ def AddEndOfTurnTiles(TileQueue, PlayerTiles, NewTileChoice, Choice):
     NoOfEndOfTurnTiles = len(Choice) + 3
   for Count in range(NoOfEndOfTurnTiles):
     PlayerTiles += TileQueue.pop()
-    TileQueue.append()
+    TileQueue.add_random_letter()
   return TileQueue, PlayerTiles  
 
 def FillHandWithTiles(TileQueue, PlayerTiles, MaxHandSize):
   while len(PlayerTiles) <= MaxHandSize:
     PlayerTiles += TileQueue.pop()
-    TileQueue.append()
+    TileQueue.add_random_letter()
   return TileQueue, PlayerTiles  
 
-def GetScoreForWord(Word, TileData: TextValues):
+def GetScoreForWord(Word, TileDictionary):
   Score = 0
-  for i in Word:
-    Score += TileData.letter_scores[i]
+  for Count in range (len(Word)):
+    Score += TileDictionary[Word[Count]]
   if len(Word) > 7:
     Score += 20
   elif len(Word) > 5:
     Score += 5
   return Score
   
-def UpdateAfterAllowedWord(Word, PlayerTiles, PlayerScore, PlayerTilesPlayed, TileData: TextValues, AllowedWords):
+def UpdateAfterAllowedWord(Word, PlayerTiles, PlayerScore, PlayerTilesPlayed, TileDictionary, AllowedWords):
   PlayerTilesPlayed += len(Word)
   for Letter in Word:
     PlayerTiles = PlayerTiles.replace(Letter, "", 1)
-  PlayerScore += GetScoreForWord(Word, TileData)
+  PlayerScore += GetScoreForWord(Word, TileDictionary)
   return PlayerTiles, PlayerScore, PlayerTilesPlayed
       
-def UpdateScoreWithPenalty(PlayerScore, PlayerTiles, TileData: TextValues):
-  for i in PlayerTiles:
-    PlayerScore -= TileData.letter_scores[i]
+def UpdateScoreWithPenalty(PlayerScore, PlayerTiles, TileDictionary):
+  for Count in range (len(PlayerTiles)):
+    PlayerScore -= TileDictionary[PlayerTiles[Count]]  
   return PlayerScore
 
 def GetChoice():
@@ -218,7 +191,7 @@ def DisplayTilesInHand(PlayerTiles):
   print()
   print("Your current hand:", PlayerTiles)
   
-def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileData: TextValues, TileQueue, AllowedWords, MaxHandSize, NoOfEndOfTurnTiles, IsBot: bool):
+def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileDictionary, TileQueue, AllowedWords, MaxHandSize, NoOfEndOfTurnTiles):
   print()
   print(PlayerName, "it is your turn.")
   DisplayTilesInHand(PlayerTiles)
@@ -227,9 +200,9 @@ def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileData: 
   while not ValidChoice:
     Choice = GetChoice()
     if Choice == "1":
-      DisplayTileValues(TileData, AllowedWords)
+      DisplayTileValues(TileDictionary, AllowedWords)
     elif Choice == "4":
-      TileQueue.Show()
+      TileQueue.show()
     elif Choice == "7":
       DisplayTilesInHand(PlayerTiles)      
     elif Choice == "0":
@@ -247,7 +220,7 @@ def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileData: 
           print()
           print("Valid word")
           print()
-          PlayerTiles, PlayerScore, PlayerTilesPlayed = UpdateAfterAllowedWord(Choice, PlayerTiles, PlayerScore, PlayerTilesPlayed, TileData, AllowedWords)
+          PlayerTiles, PlayerScore, PlayerTilesPlayed = UpdateAfterAllowedWord(Choice, PlayerTiles, PlayerScore, PlayerTilesPlayed, TileDictionary, AllowedWords)
           NewTileChoice = GetNewTileChoice()
       if not ValidWord:
         print()
@@ -261,28 +234,26 @@ def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileData: 
       print("You have played", PlayerTilesPlayed, "tiles so far in this game.")
   return PlayerTiles, PlayerTilesPlayed, PlayerScore, TileQueue  
 
-def DisplayWinner(PlayerOneScore, PlayerTwoScore, PlayerOneName, PlayerTwoName):
+def DisplayWinner(PlayerOneScore, PlayerTwoScore):
   print()
   print("**** GAME OVER! ****")
   print()
-  print(PlayerOneName, "your score is", PlayerOneScore)
-  print(PlayerTwoName, "your score is", PlayerTwoScore)
+  print("Player One your score is", PlayerOneScore)
+  print("Player Two your score is", PlayerTwoScore)
   if PlayerOneScore > PlayerTwoScore:
-    print(PlayerOneName, "wins!")
+    print("Player One wins!")
   elif PlayerTwoScore > PlayerOneScore:
-    print(PlayerTwoName, "wins!")
+    print("Player Two wins!")
   else:
     print("It is a draw!")
   print()
   
-def PlayGame(AllowedWords, TileData: TextValues, RandomStart, StartHandSize, MaxHandSize, MaxTilesPlayed, NoOfEndOfTurnTiles):
-  PlayerOneName = input("Player one's name >")
-  PlayerTwoName = input("Player two's name >")
+def PlayGame(AllowedWords, TileDictionary, RandomStart, StartHandSize, MaxHandSize, MaxTilesPlayed, NoOfEndOfTurnTiles):
   PlayerOneScore = 50
   PlayerTwoScore = 50
   PlayerOneTilesPlayed = 0
   PlayerTwoTilesPlayed = 0
-  TileQueue = QueueOfTiles(20, TileData.letter_frequency)
+  TileQueue = QueueOfTiles(20)
   if RandomStart:
     PlayerOneTiles = GetStartingHand(TileQueue, StartHandSize)
     PlayerTwoTiles = GetStartingHand(TileQueue, StartHandSize)
@@ -290,14 +261,14 @@ def PlayGame(AllowedWords, TileData: TextValues, RandomStart, StartHandSize, Max
     PlayerOneTiles = "BTAHANDENONSARJ"
     PlayerTwoTiles = "CELZXIOTNESMUAA"
   while PlayerOneTilesPlayed <= MaxTilesPlayed and PlayerTwoTilesPlayed <= MaxTilesPlayed and len(PlayerOneTiles) < MaxHandSize and len(PlayerTwoTiles) < MaxHandSize:
-    PlayerOneTiles, PlayerOneTilesPlayed, PlayerOneScore, TileQueue = HaveTurn(PlayerOneName, PlayerOneTiles, PlayerOneTilesPlayed, PlayerOneScore, TileData, TileQueue, AllowedWords, MaxHandSize, NoOfEndOfTurnTiles, False)
+    PlayerOneTiles, PlayerOneTilesPlayed, PlayerOneScore, TileQueue = HaveTurn("Player One", PlayerOneTiles, PlayerOneTilesPlayed, PlayerOneScore, TileDictionary, TileQueue, AllowedWords, MaxHandSize, NoOfEndOfTurnTiles)
     print()
     input("Press Enter to continue")
     print()
-    PlayerTwoTiles, PlayerTwoTilesPlayed, PlayerTwoScore, TileQueue = HaveTurn(PlayerTwoName, PlayerTwoTiles, PlayerTwoTilesPlayed, PlayerTwoScore, TileData, TileQueue, AllowedWords, MaxHandSize, NoOfEndOfTurnTiles, True)
-  PlayerOneScore = UpdateScoreWithPenalty(PlayerOneScore, PlayerOneTiles, TileData)
-  PlayerTwoScore = UpdateScoreWithPenalty(PlayerTwoScore, PlayerTwoTiles, TileData)
-  DisplayWinner(PlayerOneScore, PlayerTwoScore, PlayerOneName, PlayerTwoName)
+    PlayerTwoTiles, PlayerTwoTilesPlayed, PlayerTwoScore, TileQueue = HaveTurn("Player Two", PlayerTwoTiles, PlayerTwoTilesPlayed, PlayerTwoScore, TileDictionary, TileQueue, AllowedWords, MaxHandSize, NoOfEndOfTurnTiles)
+  PlayerOneScore = UpdateScoreWithPenalty(PlayerOneScore, PlayerOneTiles, TileDictionary)
+  PlayerTwoScore = UpdateScoreWithPenalty(PlayerTwoScore, PlayerTwoTiles, TileDictionary)
+  DisplayWinner(PlayerOneScore, PlayerTwoScore)
 
 def DisplayMenu():
   print()
@@ -307,7 +278,6 @@ def DisplayMenu():
   print()
   print("1. Play game with random start hand")
   print("2. Play game with training start hand")
-  print("3. View high scores")
   print("9. Quit")
   print()
   
@@ -318,7 +288,7 @@ def Main():
   print()
   print()
   AllowedWords = LoadAllowedWords()
-  TileData = TextValues()
+  TileDictionary = CreateTileDictionary()
   MaxHandSize = 20
   MaxTilesPlayed = 50
   NoOfEndOfTurnTiles = 3
@@ -328,9 +298,9 @@ def Main():
     DisplayMenu()
     Choice = input("Enter your choice: ")
     if Choice == "1":
-      PlayGame(AllowedWords, TileData, True, StartHandSize, MaxHandSize, MaxTilesPlayed, NoOfEndOfTurnTiles)
+      PlayGame(AllowedWords, TileDictionary, True, StartHandSize, MaxHandSize, MaxTilesPlayed, NoOfEndOfTurnTiles)
     elif Choice == "2":
-      PlayGame(AllowedWords, TileData, False, 15, MaxHandSize, MaxTilesPlayed, NoOfEndOfTurnTiles)
+      PlayGame(AllowedWords, TileDictionary, False, 15, MaxHandSize, MaxTilesPlayed, NoOfEndOfTurnTiles)
       
 if __name__ == "__main__":
   Main()
