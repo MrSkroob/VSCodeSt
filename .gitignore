@@ -3671,3 +3671,4 @@ qtstuff/.venv/Scripts/pythonw.exe
 qtstuff/.venv/Scripts/pyuic5.exe
 qtstuff/dialogue.py
 qtstuff/experiment.py
+qtstuff/c_stuff
