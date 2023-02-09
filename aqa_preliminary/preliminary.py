@@ -79,25 +79,20 @@ class TextValues():
     self.letter_count = sum(self.letter_frequency)
 
     for i, v in enumerate(self.letter_frequency):
-      score = max([int((self.letter_count / v) / 5), 1])
-      print(chr(65 + i), score)
+      score = self.get_score_for_word(v)
       self.letter_scores[chr(65 + i)] = score
 
   def get_character_from_index(index: int):
     """Returns the alphabetic character from its ordinal position in the alphabet"""
     return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index]
 
-
-class Leaderboard():
-  def __init__(self) -> None:
-    self._scores = {}
-    with open("high_scores.json", "r") as f:
-      self._scores = json.load(f)
-
-  def add_score(self, score: int, player_name: str):
-    for i in self._scores:
+  def get_score_for_word(self, word: str) -> int:
+    return max([int((self.letter_count / word) / 5), 1])
+  
+  def get_highest_score(self, word_list: list):
+    max_score = 0
+    for i in word_list:
       pass
-    pass
 
     
 def DisplayTileValues(TileData: TextValues, AllowedWords):
@@ -190,7 +185,7 @@ def UpdateScoreWithPenalty(PlayerScore, PlayerTiles, TileData: TextValues):
     PlayerScore -= TileData.letter_scores[i]
   return PlayerScore
 
-def GetChoice():
+def GetChoice(is_bot: bool):
   print()
   print("Either:")
   print("     enter the word you would like to play OR")
@@ -198,9 +193,13 @@ def GetChoice():
   print("     press 4 to view the tile queue OR")
   print("     press 7 to view your tiles again OR")
   print("     press 0 to fill hand and stop the game.")
-  Choice = input(">")
+  if is_bot:
+    Choice = ""
+  else:
+    Choice = input(">")
+    Choice = Choice.upper()
   print()
-  Choice = Choice.upper()
+  
   return Choice
 
 def GetNewTileChoice():
@@ -225,7 +224,7 @@ def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileData: 
   NewTileChoice = "2"
   ValidChoice = False
   while not ValidChoice:
-    Choice = GetChoice()
+    Choice = GetChoice(IsBot)
     if Choice == "1":
       DisplayTileValues(TileData, AllowedWords)
     elif Choice == "4":
