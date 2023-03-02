@@ -5,65 +5,45 @@
 
 import random
 
-
 class QueueOfTiles():
-  def __init__(self, max_size: int) -> None:
-    self._queue = [None] * max_size
-    self._front = -1
-    self._rear = -1
-    self._index = 0
-    self._max_size = max_size
-    for _ in range(max_size):
-      self.add_random_letter()
-
-  def pop(self):
-    """Returns the item at the front of the queue"""
-    if self.is_empty(): raise IndexError("Queue empty")
-    item = self._queue[self._front]
-    if self._front == self._rear:
-      self._front = -1
-      self._rear = -1
+  def __init__(self, MaxSize):
+    self._Contents = []
+    self._Rear = -1
+    self._MaxSize = MaxSize
+    for Count in range(self._MaxSize):
+      self._Contents.append("")
+      self.Add()
+      
+  def IsEmpty(self):
+    if self._Rear == -1:
+      return True
     else:
-      self._front = (self._front + 1) % self._max_size
-    self._index = self._front
-    return item
+      return False
 
-  def add_random_letter(self):
-    """Wrapper for .append to add a random character to the queue"""
-    self.append(chr(65 + random.randint(0, 25)))
-
-  def append(self, item):
-    """Adds item to the end of the queue"""
-    if self.is_full(): raise IndexError("Queue full")
-    self._index = self._front
-    if self.is_empty():
-      self._front = 0
-      self._rear = 0
+  def Remove(self):
+    if self.IsEmpty():
+      return None
     else:
-      self._rear = (self._rear + 1) % self._max_size
-    self._queue[self._rear] = item
+      Item = self._Contents[0]
+      for Count in range (1, self._Rear + 1):
+        self._Contents[Count - 1] = self._Contents[Count]
+      self._Contents[self._Rear] = ""
+      self._Rear -= 1
+      return Item
 
-  def __iter__(self):
-    return self
-  
-  def __next__(self):
-    if self.is_empty(): raise StopIteration
-    if self._index + 1 == self._rear: raise StopIteration
-    self._index = (self._index + 1) % self._max_size
-    return self._queue[self._index]
+  def Add(self):
+    if self._Rear < self._MaxSize - 1:
+      RandNo = random.randint(0, 25)
+      self._Rear += 1
+      self._Contents[self._Rear] = chr(65 + RandNo)
 
-  def show(self):
-    """Prints out the contents of the queue"""
-    for i in self:
-      print(i, end="")
-    print()
-
-  def is_empty(self):
-    return self._rear == -1 and self._front == -1
-  
-  def is_full(self):
-    return (self._rear + 1) % self._max_size == self._front
-
+  def Show(self):
+    if self._Rear != -1:
+      print()
+      print("The contents of the queue are: ", end="")
+      for Item in self._Contents:
+        print(Item, end="")
+      print()
 
 def CreateTileDictionary():
   TileDictionary = dict()
@@ -74,6 +54,8 @@ def CreateTileDictionary():
       TileDictionary[chr(65 + Count)] = 2
     elif Count in [5, 7, 10, 21, 22, 24]:
       TileDictionary[chr(65 + Count)] = 3
+    elif Count in [9, 23]:
+      TileDictionary[chr(65 + Count)] = 4 
     else:
       TileDictionary[chr(65 + Count)] = 5
   return TileDictionary
@@ -84,13 +66,19 @@ def DisplayTileValues(TileDictionary, AllowedWords):
   print()  
   for Letter, Points in TileDictionary.items():
     print("Points for " + Letter + ": " + str(Points))
+  CalculateFrequencies(AllowedWords)
   print()
+
+def CalculateFrequencies(AllowedWords: list):
+  word_string = "".join(AllowedWords)
+  for i in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+    print(f"Letter {i} occurs {word_string.count(i)} time(s)")
 
 def GetStartingHand(TileQueue, StartHandSize):
   Hand = ""
   for Count in range(StartHandSize):
-    Hand += TileQueue.pop()
-    TileQueue.add_random_letter()
+    Hand += TileQueue.Remove()
+    TileQueue.Add()
   return Hand
 
 def LoadAllowedWords():
@@ -131,14 +119,14 @@ def AddEndOfTurnTiles(TileQueue, PlayerTiles, NewTileChoice, Choice):
   else:
     NoOfEndOfTurnTiles = len(Choice) + 3
   for Count in range(NoOfEndOfTurnTiles):
-    PlayerTiles += TileQueue.pop()
-    TileQueue.add_random_letter()
+    PlayerTiles += TileQueue.Remove()
+    TileQueue.Add()
   return TileQueue, PlayerTiles  
 
 def FillHandWithTiles(TileQueue, PlayerTiles, MaxHandSize):
   while len(PlayerTiles) <= MaxHandSize:
-    PlayerTiles += TileQueue.pop()
-    TileQueue.add_random_letter()
+    PlayerTiles += TileQueue.Remove()
+    TileQueue.Add()
   return TileQueue, PlayerTiles  
 
 def GetScoreForWord(Word, TileDictionary):
@@ -202,7 +190,7 @@ def HaveTurn(PlayerName, PlayerTiles, PlayerTilesPlayed, PlayerScore, TileDictio
     if Choice == "1":
       DisplayTileValues(TileDictionary, AllowedWords)
     elif Choice == "4":
-      TileQueue.show()
+      TileQueue.Show()
     elif Choice == "7":
       DisplayTilesInHand(PlayerTiles)      
     elif Choice == "0":
@@ -282,6 +270,10 @@ def DisplayMenu():
   print()
   
 def Main():
+  MaxHandSize = 20
+  StartHandSize = 0
+  while StartHandSize not in range(1, MaxHandSize - 1):
+    StartHandSize = int(input("Enter start hand size"))
   print("++++++++++++++++++++++++++++++++++++++")
   print("+ Welcome to the WORDS WITH AQA game +")
   print("++++++++++++++++++++++++++++++++++++++")
@@ -289,10 +281,8 @@ def Main():
   print()
   AllowedWords = LoadAllowedWords()
   TileDictionary = CreateTileDictionary()
-  MaxHandSize = 20
   MaxTilesPlayed = 50
   NoOfEndOfTurnTiles = 3
-  StartHandSize = 15
   Choice = ""
   while Choice != "9":
     DisplayMenu()
