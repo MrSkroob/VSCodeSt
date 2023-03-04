@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, request, abort
+from flask import Flask, request, abort, render_template
 
 
 app = Flask(__name__)
@@ -24,15 +24,25 @@ def calculate_birthday(day: int, month: int, year: int):
     
 
 @app.route("/")
+def index():
+    return render_template("birthday.html")
+
+@app.route("/birthday", methods=["POST"])
 def birthday():
-    day = request.args.get("day", "")
-    month = request.args.get("month", "")
-    year = request.args.get("year", "")
+    date_str = request.form["date"]
+    if date_str == "":
+        """No date inputed, default to today"""
+        today = datetime.datetime.today()
+        day = today.day - 1
+        month = today.month
+        year = today.year
+    else:
+        time = date_str.split("-")
+        day = int(time[2])
+        month = int(time[1])
+        year = int(time[0])
     if year and month and day:
         try: 
-            day = int(day)
-            month = int(month)
-            year = int(year)
             days_left = calculate_birthday(day, month, year)
             # just printing stuff in the console
             print(f"date: {day}/{month}/{year}")
