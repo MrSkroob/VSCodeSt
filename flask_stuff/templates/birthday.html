@@ -11,5 +11,16 @@
         <p><input type="date" id="name" name="date" value=""></p>
         <p><input type="submit" value = "Submit" /></p> 
     </form>
+    {% if days %}
+        {% if days == 365 %}
+            <p>Cake day: {{date}}</p>
+            <p>Next cake day: {{next_date}}</p>
+            <h2>🎂Happy cake day!🎂</h2>
+        {% else %}
+            <p>Cake day: {{date}}</p>
+            <p>Next cake day: {{next_date}}</p>
+            <p>Days until your next cake day: {{days}}</p>
+        {% endif %}
+    {% endif %}
 </body>
 </html>

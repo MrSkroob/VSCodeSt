@@ -7,13 +7,12 @@ app = Flask(__name__)
 
 def days_until_next_birthday(birthdaymonth: int, birthdayday: int):
     """Returns number of days until next birthday"""
-    nowdatetime = datetime.datetime.now() # create datetime object for right now
-    birthdaydate = datetime.datetime(nowdatetime.year, birthdaymonth, birthdayday) # create datetime object for birthday
-    difference = birthdaydate - nowdatetime
-    if difference.days < 0: # check if birthday has passed
-        birthdaydate = datetime.datetime(nowdatetime.year + 1, birthdaymonth, birthdayday)
-        difference = abs(birthdaydate - nowdatetime) # calculate difference again
-    return difference.days + 1
+    today = datetime.datetime.today() # create datetime object for right now
+    birthdaydate = datetime.datetime(today.year, birthdaymonth, birthdayday) # create datetime object for birthday
+    if birthdaydate > today: # check if birthday has passed
+        birthdaydate = datetime.datetime(today.year + 1, birthdaymonth, birthdayday)
+    difference = birthdaydate - today
+    return difference.days, birthdaydate
 
 
 def calculate_birthday(day: int, month: int, year: int):
@@ -33,7 +32,7 @@ def birthday():
     if date_str == "":
         """No date inputed, default to today"""
         today = datetime.datetime.today()
-        day = today.day - 1
+        day = today.day
         month = today.month
         year = today.year
     else:
@@ -43,11 +42,14 @@ def birthday():
         year = int(time[0])
     if year and month and day:
         try: 
-            days_left = calculate_birthday(day, month, year)
+            days_left, next_birthday = calculate_birthday(day, month, year)
             # just printing stuff in the console
-            print(f"date: {day}/{month}/{year}")
-            print(f"days left: {days_left}")
-            return f"Days left until your birthday: {days_left}"
+            date = f"{day}/{month}/{year}"
+            next_date = f"{next_birthday.day}/{next_birthday.month}/{next_birthday.year}"
+            print("today", datetime.datetime.today().date())
+            print(f"next birthday:", next_birthday.date())
+            print(f"days left: {next_birthday.date() - datetime.datetime.today().date()}")
+            return render_template("birthday.html", date=date, next_date=next_date, days=days_left)
         except (ValueError, OverflowError) as exception:
             # handling different errors
             if type(exception) is ValueError:

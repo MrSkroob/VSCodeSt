@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to this cool chatroom</title>
+</head>
+<body>
+    <form action = "/" method = "post">
+        Alias<br>
+        <input type="text" id="Alias" name="Alias" value=""><br>
+        What is your message?<br>
+        <input type="text" id="Message" name="Message" value=""><br>
+        <p><input type = "submit" value = "Post" /></p>
+    </form>
+    <ul>
+        {% for message in messages %}
+        <li>
+            {{message}}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
