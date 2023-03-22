@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, request, abort, render_template
+from flask import Flask, request, render_template, redirect
 
 
 app = Flask(__name__)
@@ -24,8 +24,10 @@ def index():
         message = request.form["Message"]
         text = f"From {name} at {datetime.datetime.today().strftime('%d/%m/%Y')} {message}"
         update_chat_data(text)
-    chat_data = get_chat_data()
-    return render_template("chat.html", messages=chat_data)
+        return redirect("/")
+    else:
+        chat_data = get_chat_data()
+        return render_template("chat.html", messages=chat_data)
 
 
 if __name__ == "__main__":
