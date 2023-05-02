@@ -11,7 +11,7 @@ WHERE albums.Title LIKE (?)
 """
 print(query)
 print('\nResults found:\n--------------')
-cursor = connection.execute(query, (name,))
+cursor = connection.execute(query, (name))
 for row in cursor:
     print(row[0])
 
