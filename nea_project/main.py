@@ -7,13 +7,12 @@
 # link for the sb3 parser I found online
 # OH GOD THERE IS NO DOCUMENTATION
 
+# turns out there is indeed a use for this, to find all the opcodes of the blocks!
+
 import sb3
 
 
 project, files = sb3.open_sb3("Scratch Project.sb3")
-
-
-print(files)
 
 
 stages = []
@@ -27,16 +26,17 @@ for i in project.targets:
 
 
 for i in sprites:
-    print("TARGET_NAME:", i.name)
+    print("\nTARGET_NAME:", i.name)
     scripts = i.block_info.scripts()
     for script in scripts:
-        print("NEW SCRIPT\n")
+        print("\nNEW SCRIPT")
         for block in script:
             print(block.opcode)
-            for input in block.inputs:
-                print(input)
-            for field in block.fields:
-                print(field)
+            # print(block.opcode)
+            # for input in block.inputs:
+            #     print(input)
+            # for field in block.fields:
+            #     print(field)
 
 
 # in the example project 'Scratch Project.sb3' it suggests that the 'looks_say' block runs before the flagclicked?
