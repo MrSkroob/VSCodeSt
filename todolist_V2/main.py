@@ -131,6 +131,7 @@ def get_int_from_user(user_question, lower_bound: int, upper_bound: int):
             pass
         else:
             break
+    return number
 
 
 def create_row_project(title: str, start_date: datetime.date, deadline: datetime.date):
@@ -175,7 +176,6 @@ def delete_task_row(id: object):
     db_connection.commit()
     
 
-
 def create_table_user(): # wrapper function to be run, is a procedure
     today = datetime.datetime.today().date()
     project_name = get_string_from_user("Enter the project name: ", 5, 20)
@@ -186,15 +186,16 @@ def create_table_user(): # wrapper function to be run, is a procedure
 
 def create_task_user():
     today = datetime.datetime.today().date()
-    project_name = get_string_from_user("Enter the project name: ", 5, 20)
+
+    project_name = get_string_from_user("Enter the task name: ", 5, 20)
     
     description = input("Enter a short description: ")
-    priority = get_int_from_user("Enter a priority", 0, 10)
+    priority = get_int_from_user("Enter a priority ", 0, 10)
 
     start_date = get_date_from_user(f"Enter the start date (leave blank for {today}): ", False) or today
     deadline = get_date_from_user("Enter deadline date (YYYY/MM/DD): ", True)
 
-    table_name = get_string_from_user("Enter the project name ", 0, 100)
+    table_name = get_string_from_user("Which project is this task for? ", 0, 100)
 
     query = """
     SELECT * FROM projects
@@ -243,7 +244,7 @@ def print_projects(cursor: tuple | list):
 def print_tasks(cursor: tuple | list):
     print("========Tasks========")
     print("{:<3} {:<21} {:<3} {:<10} {:<10}".format("ID", "Title", "Priority", "Start date", "Deadline"))
-    for (id, _, title, _, priority, date_start, date_end) in cursor:
+    for (id, _, title, priority, date_start, date_end) in cursor:
         print("{:<3} {:<21} {:<3} {:<10} {:<10}".format(id, title, priority, date_start, date_end))
 
 
