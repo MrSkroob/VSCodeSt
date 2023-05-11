@@ -1,1 +1,17 @@
-{}
+{
+    "move": {
+        "opcode": "motion_movesteps"
+    },
+    "turn_left": {
+        "opcode": "motion_turnleft"
+    },
+    "turn_right": {
+        "opcode": "motion_turnright"
+    },
+    "goto": {
+        "opcode": "motion_goto"
+    },
+    "gotoxy": {
+        
+    }
+}

@@ -64,10 +64,6 @@ def compile(code: list, compile_to: str):
             raise scratch_exceptions.NoReturn
         
         if contains(i, "def "): # defined a function
-            re_object = re.search(BETWEEN_BRACKETS, i)
-            if re_object.group():
-                raise scratch_exceptions.NoArgumentsAllowed
-            
             layer.append([indents, "function"])
         elif len(layer) > 0 and indents == layer[0][0]:
             layer.pop()

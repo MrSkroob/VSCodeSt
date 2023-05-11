@@ -22,9 +22,11 @@ class Sprite(BaseScripts):
         pass
     def turn_right(self, degrees: int | float):
         pass
-    def goto(self, position: scratch_enums.Position | scratch_enums.Coordinates):
+    def goto(self, position: scratch_enums.Position):
         pass
-    def glide(self, duration: int, position: scratch_enums.Position | scratch_enums.Coordinates):
+    def goto_x_y(self, position: scratch_enums.Coordinates):
+        pass
+    def glide(self, duration: int, position: scratch_enums.Coordinates):
         pass
     def point_in_direction(self, direction: int | float):
         pass
