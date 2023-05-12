@@ -1,6 +1,6 @@
 import scratch_project
 import scratch_enums
-
+# import scratch_compiler
 
 sprite = scratch_project.Sprite("Sprite1")
 

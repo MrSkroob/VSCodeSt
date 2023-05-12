@@ -25,6 +25,9 @@ for i in project.targets:
         stages.append(i) # honestly, this shouldn't even have more than 1 length
 
 
+print(project.targets[1].block_info.blocks())
+
+
 for i in sprites:
     print("\nTARGET_NAME:", i.name)
     scripts = i.block_info.scripts()

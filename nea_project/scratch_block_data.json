@@ -13,5 +13,11 @@
     },
     "gotoxy": {
         
+    },
+    "def": {
+        "opcode": "procedures_definition"
+    },
+    "proc": {
+        "opcode": "pcoedures_call"
     }
 }

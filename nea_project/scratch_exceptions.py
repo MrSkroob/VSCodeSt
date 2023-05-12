@@ -6,7 +6,7 @@ class TooManySprites(Exception):
 
 class NoReturn(Exception):
     def __init__(self):
-        message = "Scratch limitation - functions cannot return anything"
+        message = "Scratch limitation - procedures only"
         super().__init__(message)
 
 
@@ -19,4 +19,10 @@ class MissingSpriteOrStudio(Exception):
 class UnsuportedMethod(Exception):
     def __init__(self):
         message = "Couldn't find an equivilant Scratch block for this method"
+        super().__init__(message)
+
+
+class NoAnonymousProcedures(Exception):
+    def __init__(self):
+        message = "Scratch limitation - procedures must have names!"
         super().__init__(message)
