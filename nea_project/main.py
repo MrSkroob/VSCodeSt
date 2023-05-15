@@ -44,5 +44,3 @@ for i in sprites:
 
 # in the example project 'Scratch Project.sb3' it suggests that the 'looks_say' block runs before the flagclicked?
 # It is consistantly placed above the event_whenflagclicked.
-
-
