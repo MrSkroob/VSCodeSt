@@ -15,9 +15,11 @@
         
     },
     "def": {
-        "opcode": "procedures_definition"
+        "opcode": "procedures_definition",
+        "proccode": ""
     },
     "proc": {
-        "opcode": "pcoedures_call"
+        "opcode": "procedures_call",
+        "proccode": ""
     }
 }
