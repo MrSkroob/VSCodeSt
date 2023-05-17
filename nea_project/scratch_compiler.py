@@ -65,6 +65,12 @@ PROCEDURE_PROTOTYPE_DATA = {
 # useful regexes
 BETWEEN_BRACKETS = r"(?<=\()(.*?)(?=\))"
 LEFT_VARIABLE_DEFINE = r"\w+\s?="
+
+LEFT_OPERATOR_PLUS = r"\w+\s?\+"
+LEFT_OPERATOR_MINUS = r"\w+\s?\-"
+LEFT_OPERATOR_MUL = r"\w+\s?\*"
+LEFT_OPERATOR_DIV = r"\w+\s?\/"
+
 RIGHT_VARIABLE_DEFINE = r"=\s?\w+"
 FUNCTION_NAME = r"(?<=def )(.*$)"
 AFTER_COLON = r"(?<=:)(.*$)"
@@ -110,9 +116,13 @@ def compile(code: list, compile_to: str):
         split = line.split(" ")
         no_whitespace = line.strip()
 
-        if no_whitespace.find("from") != -1: continue
-        if no_whitespace.find("import") != -1: continue
-        if not no_whitespace: continue
+        if no_whitespace.find("from") != -1 or no_whitespace.find("import") != 1: 
+            if contains(line, "scratch_project") != -1 or contains(line, "scratch_enums") != -1:
+                continue
+            else:
+                raise scratch_exceptions.UnsupportedFeature("imports")
+        elif not no_whitespace: 
+            continue
 
         indents = len(line) - len(line.lstrip())
 
@@ -122,7 +132,7 @@ def compile(code: list, compile_to: str):
             
             re_object = re.search(BETWEEN_BRACKETS, line)
             if re_object is None:
-                raise scratch_exceptions.CouldNotFindSprite("None")
+                raise scratch_exceptions.CouldNotFindSprite("")
             parent = re_object.group().strip().strip('"')
             if parent not in sprite_names:
                 raise scratch_exceptions.CouldNotFindSprite(parent)
@@ -133,6 +143,8 @@ def compile(code: list, compile_to: str):
         if contains(line, "lambda"): raise scratch_exceptions.NoAnonymousProcedures
         if contains(line, "class"): raise scratch_exceptions.UnsupportedFeature("class")
         if contains(line, "return"): raise scratch_exceptions.NoReturn
+        if contains(line, "{"): raise scratch_exceptions.UnsupportedFeature("dictionaries")
+        if contains(line, "}"): raise scratch_exceptions.UnsupportedFeature("dictionaries")
         if contains(line, "def "): # defined a function
             function_name_re = re.search(FUNCTION_NAME, line)
             if function_name_re is None:
@@ -171,10 +183,12 @@ def compile(code: list, compile_to: str):
             except IndexError:
                 pass
 
-        elif contains(line, " = "):
+        elif contains(line, "="):
             variable_name_re = re.search(LEFT_VARIABLE_DEFINE, line)
             if variable_name_re:
                 variable_name = variable_name_re.group()
+                if variable_name in ["+", "-", "*", "/"]:
+                    pass
                 variables.append(variable_name)
                 
 
