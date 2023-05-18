@@ -103,12 +103,13 @@ def load_project(file_name: str) -> json:
 def compile(code: list, compile_to: str):
     # load_project(compile_to)
     block_id = 0
+    input_id = 0
     parent = ""
     parent_variable_name = ""
     variables = []
     lists = []
     broadcasts = []
-    functions = []
+    custom_blocks = []
     compiled_result = {}
     for index in range(len(code)): # oh god i feel like im gonna commit sewerslide after this
         line = code[index]
@@ -145,43 +146,43 @@ def compile(code: list, compile_to: str):
         if contains(line, "return"): raise scratch_exceptions.NoReturn
         if contains(line, "{"): raise scratch_exceptions.UnsupportedFeature("dictionaries")
         if contains(line, "}"): raise scratch_exceptions.UnsupportedFeature("dictionaries")
-        if contains(line, "def "): # defined a function
-            function_name_re = re.search(FUNCTION_NAME, line)
-            if function_name_re is None:
-                raise scratch_exceptions.NoAnonymousProcedures
+        # if contains(line, "def "): # defined a function
+        #     function_name_re = re.search(FUNCTION_NAME, line)
+        #     if function_name_re is None:
+        #         raise scratch_exceptions.NoAnonymousProcedures
             
-            function_name = function_name_re.group()
-            parameters_re = re.search(BETWEEN_BRACKETS, line)
-            parameters = parameters_re.group()
-            for i in parameters.split(", "):
-                print(i)
-                param_type_re = re.search(AFTER_COLON, i)
-                if param_type_re is None:
-                    raise scratch_exceptions.MissingArgumentType
-                param_type = param_type_re.group().strip()
-                if param_type in ["int", "float"]:
-                    function_name += " %s"
-                elif param_type == "bool":
-                    function_name += " %s"
-                else:
-                    raise scratch_exceptions.InvalidArgumentType(param_type)
+        #     function_name = function_name_re.group()
+        #     parameters_re = re.search(BETWEEN_BRACKETS, line)
+        #     parameters = parameters_re.group()
+        #     for i in parameters.split(", "):
+        #         print(i)
+        #         param_type_re = re.search(AFTER_COLON, i)
+        #         if param_type_re is None:
+        #             raise scratch_exceptions.MissingArgumentType
+        #         param_type = param_type_re.group().strip()
+        #         if param_type in ["int", "float"]:
+        #             function_name += " %s"
+        #         elif param_type == "bool":
+        #             function_name += " %s"
+        #         else:
+        #             raise scratch_exceptions.InvalidArgumentType(param_type)
 
-            function_block_data = json_data["def"]
-            function_block_data["proccode"] = function_name
-            compiled_result[str(block_id)] = json_data["def"]
-            functions.append(function_name)
-            try:
-                func_index = index
-                func_line = code[func_index + 1]
+        #     function_block_data = json_data["def"]
+        #     function_block_data["proccode"] = function_name
+        #     compiled_result[str(block_id)] = json_data["def"]
+        #     custom_blocks.append(function_name)
+        #     try:
+        #         func_index = index
+        #         func_line = code[func_index + 1]
 
-                func_indents = indents
-                while func_indents != indents:
-                    func_indents = func_line[func_index]
-                    func_index += 1
-                    func_indents = len(func_line) - len(line.lstrip())
-                    block_id += 1
-            except IndexError:
-                pass
+        #         func_indents = indents
+        #         while func_indents != indents:
+        #             func_indents = func_line[func_index]
+        #             func_index += 1
+        #             func_indents = len(func_line) - len(line.lstrip())
+        #             block_id += 1
+        #     except IndexError:
+        #         pass
 
         elif contains(line, "="):
             variable_name_re = re.search(LEFT_VARIABLE_DEFINE, line)
