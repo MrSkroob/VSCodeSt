@@ -4,8 +4,8 @@ import scratch_enums
 
 class BaseScripts():
     # events
-    def green_flag_clicked(self, code: function):
-            pass
+    def green_flag_clicked(self, code: function, *args, **kwargs):
+        code(args, kwargs)
     
     # looks
     def switch_costume_to(self, costume: int | str):
