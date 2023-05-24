@@ -132,6 +132,11 @@ class Outlet:
     Details += str(self._MaxCapacity) + "      Daily Costs: " + str(self._DailyCosts) + "      Visits today: " + str(self._VisitsToday)
     return Details
 
+
+class Cinema(Outlet):
+  def CalculateDailyProfitLoss(self, AvgCostPerMeal, AvgPricePerMeal):
+    return super().CalculateDailyProfitLoss(AvgCostPerMeal, AvgPricePerMeal * 2)
+
 class Company:
   def __init__(self, Name, Category, Balance, X, Y, FuelCostPerUnit, BaseCostOfDelivery):
     self._Outlets = []
@@ -141,6 +146,10 @@ class Company:
     self._FamilyFoodOutletCapacity = 150
     self._FastFoodOutletCapacity = 200        
     self._NamedChefOutletCapacity = 50
+    
+    self._CinemaOutletCost = 100000
+    self._CinemaOutletCapacity = 300
+
     self._Name = Name
     self._Category = Category
     self._Balance = Balance
@@ -155,6 +164,10 @@ class Company:
     elif self._Category == "family":
       self._AvgCostPerMeal = 12
       self._AvgPricePerMeal = 14
+      self._ReputationScore += random.random() * 30 - 5
+    elif self._Category == "cinema":
+      self._AvgCostPerMeal = 8
+      self._AvgPricePerMeal = 10
       self._ReputationScore += random.random() * 30 - 5
     else:
       self._AvgCostPerMeal = 20
@@ -248,10 +261,16 @@ class Company:
     elif self._Category == "family":
       self._Balance -= self._FamilyOutletCost
       self._Capacity = self._FamilyFoodOutletCapacity
+    elif self._Category == "cinema":
+      self._Balance -= self._CinemaOutletCost
+      self._Capacity = self._CinemaOutletCapacity
     else:
       self._Balance -= self._NamedChefOutletCost
       self._Capacity = self._NamedChefOutletCapacity
-    NewOutlet = Outlet(X, Y, self._Capacity)
+    if self._Category == "cinema":
+      NewOutlet = Cinema(X, Y, self._Capacity)
+    else:
+      NewOutlet = Outlet(X, Y, self._Capacity)
     self._Outlets.append(NewOutlet)
         
   def __GetListOfOutlets(self):
@@ -302,6 +321,10 @@ class Simulation:
       self._Companies[2].OpenOutlet(400, 390)
       self._Companies[2].OpenOutlet(820, 370)
       self._Companies[2].OpenOutlet(800, 600)
+
+      Company4 = Company("Garbage tastes", "cinema", 25000, 1293, 23, self._FuelCostPerUnit, self._BaseCostforDelivery)
+      self._Companies.append(Company4)
+      self._Companies[3].OpenOutlet(50, 349)
     else:
       self._NoOfCompanies = int(input("Enter number of companies that exist at start of simulation: "))
       for Count in range (1, self._NoOfCompanies + 1):
@@ -316,6 +339,8 @@ class Simulation:
     print("3. Modify company")
     print("4. Add new company")
     print("6. Advance to next day")
+    print("7. Advance n days")
+    print("8. Advance until next event")
     print("Q. Quit")
     print("\nEnter your choice: ", end = "")
 
@@ -329,35 +354,40 @@ class Simulation:
       Details = C.ProcessDayEnd()
       print(Details + "\n")
 
-  def __ProcessAddHouseholdsEvent(self):
+  def __ProcessAddHouseholdsEvent(self, display_events: bool):
     NoOfNewHouseholds = random.randint(1, 4)
     for Count in range(1, NoOfNewHouseholds + 1):
       self._SimulationSettlement.AddHousehold()
-    print(str(NoOfNewHouseholds) + " new households have been added to the settlement.")
+    if display_events:
+      print(str(NoOfNewHouseholds) + " new households have been added to the settlement.")
         
-  def __ProcessCostOfFuelChangeEvent(self):
+  def __ProcessCostOfFuelChangeEvent(self, display_events: bool):
     FuelCostChange = random.randint(1, 9) / 10.0
     UpOrDown = random.randint(0, 1)
     CompanyNo = random.randint(0, len(self._Companies) - 1)
     if UpOrDown == 0:
-      print("The cost of fuel has gone up by " + str(FuelCostChange) + " for " + self._Companies[CompanyNo].GetName())
+      if display_events:
+        print("The cost of fuel has gone up by " + str(FuelCostChange) + " for " + self._Companies[CompanyNo].GetName())
     else:
-      print("The cost of fuel has gone down by " + str(FuelCostChange) + " for " + self._Companies[CompanyNo].GetName())
+      if display_events:
+        print("The cost of fuel has gone down by " + str(FuelCostChange) + " for " + self._Companies[CompanyNo].GetName())
       FuelCostChange *= -1
     self._Companies[CompanyNo].AlterFuelCostPerUnit(FuelCostChange)
         
-  def __ProcessReputationChangeEvent(self):
+  def __ProcessReputationChangeEvent(self, display_events: bool):
     ReputationChange = random.randint(1, 9) / 10.0
     UpOrDown = random.randint(0, 1)
     CompanyNo = random.randint(0, len(self._Companies) - 1)
     if UpOrDown == 0:
-      print("The reputation of " + self._Companies[CompanyNo].GetName() + " has gone up by " + str(ReputationChange))
+      if display_events:
+        print("The reputation of " + self._Companies[CompanyNo].GetName() + " has gone up by " + str(ReputationChange))
     else:
-      print("The reputation of " + self._Companies[CompanyNo].GetName() + " has gone down by " + str(ReputationChange))
+      if display_events:
+        print("The reputation of " + self._Companies[CompanyNo].GetName() + " has gone down by " + str(ReputationChange))
       ReputationChange *= -1
     self._Companies[CompanyNo].AlterReputation(ReputationChange)
         
-  def __ProcessCostChangeEvent(self):
+  def __ProcessCostChangeEvent(self, display_events: bool):
     CostToChange = random.randint(0, 1)
     UpOrDown = random.randint(0, 1)
     CompanyNo = random.randint(0, len(self._Companies) - 1)
@@ -365,42 +395,52 @@ class Simulation:
     if CostToChange == 0:
       AmountOfChange = random.randint(1, 19) / 10.0
       if UpOrDown == 0:
-        print("The daily costs for " + self._Companies[CompanyNo].GetName() + " have gone up by " + str(AmountOfChange))
+        if display_events:
+          print("The daily costs for " + self._Companies[CompanyNo].GetName() + " have gone up by " + str(AmountOfChange))
       else:
-        print("The daily costs for " + self._Companies[CompanyNo].GetName() + " have gone down by " + str(AmountOfChange))
+        if display_events:
+          print("The daily costs for " + self._Companies[CompanyNo].GetName() + " have gone down by " + str(AmountOfChange))
         AmountOfChange *= -1
       self._Companies[CompanyNo].AlterDailyCosts(AmountOfChange)
     else:
       AmountOfChange = random.randint(1, 9) / 10.0
       if UpOrDown == 0:
-        print("The average cost of a meal for " + self._Companies[CompanyNo].GetName() + " has gone up by " + str(AmountOfChange))
+        if display_events:
+          print("The average cost of a meal for " + self._Companies[CompanyNo].GetName() + " has gone up by " + str(AmountOfChange))
       else:
-        print("The average cost of a meal for " + self._Companies[CompanyNo].GetName() + " has gone down by " + str(AmountOfChange))
+        if display_events:
+          print("The average cost of a meal for " + self._Companies[CompanyNo].GetName() + " has gone down by " + str(AmountOfChange))
         AmountOfChange *= -1
       self._Companies[CompanyNo].AlterAvgCostPerMeal(AmountOfChange)
         
-  def __DisplayEventsAtDayEnd(self):
-    print("\n***********************")
-    print("*****   Events:   *****")
-    print("***********************\n")
+  def __DisplayEventsAtDayEnd(self, display_events: bool):
+    """Processes events that happen, returns True if there is one, False if there wasn't"""
+    if display_events:
+      print("\n***********************")
+      print("*****   Events:   *****")
+      print("***********************\n")
     EventRanNo = random.random()
     if EventRanNo < 0.25:
       EventRanNo = random.random()
       if EventRanNo < 0.25:
-        self.__ProcessAddHouseholdsEvent()
+        self.__ProcessAddHouseholdsEvent(display_events)
       EventRanNo = random.random()
       if EventRanNo < 0.5:
-        self.__ProcessCostOfFuelChangeEvent()
+        self.__ProcessCostOfFuelChangeEvent(display_events)
       EventRanNo = random.random()
       if EventRanNo < 0.5 :
-        self.__ProcessReputationChangeEvent()
+        self.__ProcessReputationChangeEvent(display_events)
       EventRanNo = random.random()
       if EventRanNo >= 0.5:
-        self.__ProcessCostChangeEvent()
+        self.__ProcessCostChangeEvent(display_events)
+      return True
     else:
-      print("No events.")
+      if display_events:
+        print("No events.")
+      return False
 
-  def ProcessDayEnd(self):
+  def ProcessDayEnd(self, display_stats: bool, display_events: bool):
+    """Processes the day. Returns whether there was an event on that day."""
     TotalReputation = 0.0
     Reputations = []
     for C in self._Companies:
@@ -418,19 +458,22 @@ class Simulation:
             self._Companies[Current].AddVisitToNearestOutlet(X, Y)
             break
           Current += 1
-    self.__DisplayCompaniesAtDayEnd()
-    self.__DisplayEventsAtDayEnd()
+    if display_stats:
+      self.__DisplayCompaniesAtDayEnd()
+    return self.__DisplayEventsAtDayEnd(display_events)
         
   def AddCompany(self):
     CompanyName = input("Enter a name for the company: ")
     Balance = int(input("Enter the starting balance for the company: "))
     TypeOfCompany = ""
-    while not(TypeOfCompany == "1" or TypeOfCompany == "2" or TypeOfCompany == "3"):
+    while TypeOfCompany not in [1, 2, 3, 4]:
       TypeOfCompany = input("Enter 1 for a fast food company, 2 for a family company or 3 for a named chef company: ")
     if TypeOfCompany == "1":
       TypeOfCompany = "fast food"
     elif TypeOfCompany == "2":
       TypeOfCompany = "family"
+    elif TypeOfCompany == "3":
+      TypeOfCompany = "cinema"
     else:
       TypeOfCompany = "named chef"
     X, Y = self._SimulationSettlement.GetRandomLocation()
@@ -500,7 +543,16 @@ class Simulation:
       elif Choice == "4":
         self.AddCompany()
       elif Choice == "6":
-        self.ProcessDayEnd()
+        self.ProcessDayEnd(True, True)
+      elif Choice == "7":
+        days = int(input("How many days?")) # I CAN'T BE ASKED TO DO STUPID EXCEPTION HANDLING DEAL WITH IT
+        for _ in range(days):
+          self.ProcessDayEnd(False, False)
+        self.__DisplayCompaniesAtDayEnd()
+      elif Choice == "8":
+        while not self.ProcessDayEnd(False, True):
+          pass
+        self.__DisplayCompaniesAtDayEnd()
       elif Choice == "Q":
         print("Simulation finished, press Enter to close.")
         input()
