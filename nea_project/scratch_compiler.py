@@ -12,12 +12,12 @@ IGNORE = [
 
 BLOCK_DATA = {
     "opcode": "",
-    "next": "",
-    "parent": "",
+    "next": None,
+    "parent": None,
     "inputs": {},
-    "fields": "",
+    "fields": {},
     "shadow": False,
-    "topLevel": "",
+    "topLevel": True,
     "x": 0,
     "y": 0
 }
@@ -98,6 +98,26 @@ def load_project(file_name: str) -> json:
         project_file = json.loads(f.read("project.json").decode("utf-8"))
     return project_file
 
+
+def save_data(file_name: str, data):
+    with zipfile.ZipFile(file_name, mode="w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as f:
+        json_dumped = json.dumps(data, ensure_ascii=False)
+        f.writestr("project.json", data=json_dumped)
+        f.testzip()
+
+
+def foo_bar(): # test function for adding a turn right block.
+    project_json = load_project("Empty Scratch Project.sb3")
+    blocks = project_json["targets"][1]["blocks"]
+    block_data = BLOCK_DATA.copy()
+    block_data["opcode"] = "motion_turnright"
+    block_data["inputs"] = {"DEGREES": [1, [4, '15']]}
+
+    # blocks[id]
+
+    blocks["0"] = block_data
+
+    save_data("Empty Scratch Project.sb3", project_json)
 
 
 def compile(code: list, compile_to: str):
@@ -217,4 +237,5 @@ if __name__ == "__main__":
         print(i)
         sprite_name = i["name"].strip('"')
         sprite_names.append(sprite_name)
-    load_python_file("scratch_example.py")
+    # foo_bar()
+    # load_python_file("scratch_example.py")

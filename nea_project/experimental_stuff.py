@@ -12,7 +12,7 @@
 import sb3
 
 
-project, files = sb3.open_sb3("Scratch Project.sb3")
+project, files = sb3.open_sb3("Empty Scratch Project.sb3")
 
 
 stages = []
@@ -34,7 +34,7 @@ for i in sprites:
     for script in scripts:
         print("\nNEW SCRIPT")
         for block in script:
-            print(block.opcode)
+            print(block)
             # print(block.opcode)
             # for input in block.inputs:
             #     print(input)
@@ -42,5 +42,7 @@ for i in sprites:
             #     print(field)
 
 
-# in the example project 'Scratch Project.sb3' it suggests that the 'looks_say' block runs before the flagclicked?
+# in the example project 'Scratch Project.sb3' it suggests that the 'looks_say' block runs before the flagclicked event?
 # It is consistantly placed above the event_whenflagclicked.
+
+

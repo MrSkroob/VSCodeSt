@@ -3,10 +3,12 @@
         "opcode": "motion_movesteps"
     },
     "turn_left": {
-        "opcode": "motion_turnleft"
+        "opcode": "motion_turnleft",
+        "inputs": {"DEGREES": [0, [4, ""]]}
     },
     "turn_right": {
-        "opcode": "motion_turnright"
+        "opcode": "motion_turnright",
+        "inputs": {"DEGREES": [0, [4, ""]]}
     },
     "goto": {
         "opcode": "motion_goto"

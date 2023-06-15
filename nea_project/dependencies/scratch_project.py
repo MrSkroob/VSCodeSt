@@ -1,5 +1,5 @@
 from __future__ import annotations
-import scratch_enums
+from . import scratch_enums
 
 
 class Studio():
@@ -62,8 +62,6 @@ class Studio():
         pass
     def reset_timer(self):
         pass
-
-
     
     # looks
     def switch_backdrop_to(self, backdrop: int | str):
@@ -82,7 +80,8 @@ class Studio():
 class Sprite(Studio):
     # motion
     def __init__(self, name: str) -> None:
-        Studio.__init__(self)
+        super().__init__()
+        # Studio.__init__(self)
         # motion
         self.x_position = 0
         self.y_position = 0

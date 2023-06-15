@@ -79,7 +79,7 @@ class Layer(Enum):
 
 
 class LayerDirection(Enum):
-    FORWRAD = 0
+    FORWARD = 0
     BACKWARD = 1
 
 
