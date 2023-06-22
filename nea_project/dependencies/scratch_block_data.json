@@ -1,27 +1,39 @@
 {
-    "move": {
-        "opcode": "motion_movesteps"
-    },
-    "turn_left": {
-        "opcode": "motion_turnleft",
-        "inputs": {"DEGREES": [0, [4, ""]]}
-    },
-    "turn_right": {
-        "opcode": "motion_turnright",
-        "inputs": {"DEGREES": [0, [4, ""]]}
-    },
-    "goto": {
-        "opcode": "motion_goto"
-    },
-    "gotoxy": {
-        
-    },
     "def": {
         "opcode": "procedures_definition",
-        "proccode": ""
+        "proccode": "",
+        "inputs": ""
     },
     "proc": {
         "opcode": "procedures_call",
         "proccode": ""
+    },
+    "green_flag_clicked": {
+        "opcode": "event_whenflagclicked"
+    },
+    "say": {
+        "opcode": "looks_say",
+        "inputs": {
+            "MESSAGE": [
+                1,
+                [
+                    10,
+                    ""
+                ]
+            ]
+        }
+    },
+    "set_variable": {
+        "opcode": "data_setvariableto",
+        "inputs": {
+            "VALUE": [
+                1,
+                [
+                    10,
+                    "0"
+                ]
+
+            ]
+        }
     }
 }

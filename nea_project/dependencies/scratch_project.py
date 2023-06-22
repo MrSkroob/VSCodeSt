@@ -78,10 +78,8 @@ class Studio():
 
 
 class Sprite(Studio):
-    # motion
     def __init__(self, name: str) -> None:
         super().__init__()
-        # Studio.__init__(self)
         # motion
         self.x_position = 0
         self.y_position = 0
@@ -94,6 +92,7 @@ class Sprite(Studio):
 
         self._name = name
 
+    # motion
     def move(self, steps: int | float):
         pass
     def turn_left(self, degrees: int | float):
