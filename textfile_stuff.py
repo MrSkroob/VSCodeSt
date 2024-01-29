@@ -1,6 +1,6 @@
 import os
 
-path = r"C://Users//Yacco//Documents//School"
+path = r"C://Users//Yacco//Documents//School//RoboCon"
 
 
 def print_text_file(path: str):
